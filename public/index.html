@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Radar PDF Kit — Premium Sales Kit & Presentation Generator</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Marked.js Markdown Parser -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-midnight-tech">
+
+  <!-- APP INTERFACE (HIDDEN DURING PRINT) -->
+  <div class="app-container no-print">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <i class="fa-solid fa-wand-magic-sparkles brand-icon"></i>
+          <div>
+            <h1>Radar PDF Kit</h1>
+            <span class="subtitle">Premium Sales Tool</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Files -->
+      <div class="sidebar-section">
+        <h3><i class="fa-regular fa-file-lines"></i> Danh sách File (.md)</h3>
+        <ul id="files-list" class="files-list">
+          <li class="loading-item">Đang tải file...</li>
+        </ul>
+      </div>
+
+      <!-- Section: Layout Configuration -->
+      <div class="sidebar-section">
+        <h3><i class="fa-solid fa-compass-drafting"></i> Định dạng đầu ra</h3>
+        <div class="toggle-group">
+          <button id="btn-layout-slides" class="toggle-btn active" data-layout="slides">
+            <i class="fa-solid fa-presentation-screen"></i> Slide Thuyết Trình
+          </button>
+          <button id="btn-layout-doc" class="toggle-btn" data-layout="doc">
+            <i class="fa-solid fa-file-invoice"></i> Tài Liệu / Sale Kit
+          </button>
+        </div>
+      </div>
+
+      <!-- Section: Theme & Styles -->
+      <div class="sidebar-section">
+        <h3><i class="fa-solid fa-palette"></i> Giao diện / Chủ đề</h3>
+        <div class="theme-grid">
+          <button class="theme-selector active" data-theme="midnight-tech" title="Midnight Tech (Tối)">
+            <span class="color-dot" style="background: linear-gradient(135deg, #1e1b4b, #311042);"></span>
+            Midnight Tech
+          </button>
+          <button class="theme-selector" data-theme="classic-ivory" title="Classic Ivory (Sáng)">
+            <span class="color-dot" style="background: linear-gradient(135deg, #fcfbfa, #064e3b);"></span>
+            Classic Ivory
+          </button>
+          <button class="theme-selector" data-theme="nordic-aurora" title="Nordic Aurora (Teal)">
+            <span class="color-dot" style="background: linear-gradient(135deg, #022c22, #34d399);"></span>
+            Nordic Aurora
+          </button>
+          <button class="theme-selector" data-theme="vibrant-sunset" title="Vibrant Sunset (Gradient)">
+            <span class="color-dot" style="background: linear-gradient(135deg, #4338ca, #be185d);"></span>
+            Vibrant Sunset
+          </button>
+          <button class="theme-selector" data-theme="corporate-navy" title="Corporate Navy (Sáng)">
+            <span class="color-dot" style="background: linear-gradient(135deg, #ffffff, #0f172a);"></span>
+            Corp Navy
+          </button>
+          <button class="theme-selector" data-theme="emerald-executive" title="Emerald Executive (Lục Bảo)">
+            <span class="color-dot" style="background: linear-gradient(135deg, #022c22, #fbbf24);"></span>
+            Emerald Exec
+          </button>
+          <button class="theme-selector" data-theme="warm-minimalist" title="Warm Minimalist (Kem ấm)">
+            <span class="color-dot" style="background: linear-gradient(135deg, #faf7f2, #c2410c);"></span>
+            Warm Minimal
+          </button>
+        </div>
+      </div>
+
+      <!-- Section: Advanced Options -->
+      <div class="sidebar-section">
+        <h3><i class="fa-solid fa-sliders"></i> Tùy chọn nâng cao</h3>
+        <div class="option-toggle-list">
+          <label class="option-toggle">
+            <input type="checkbox" id="chk-combine-files">
+            <span class="toggle-slider"></span>
+            <span class="toggle-label"><i class="fa-solid fa-cubes"></i> Ghép các file .md</span>
+          </label>
+          <label class="option-toggle">
+            <input type="checkbox" id="chk-auto-toc">
+            <span class="toggle-slider"></span>
+            <span class="toggle-label"><i class="fa-solid fa-list-ol"></i> Tự động tạo Mục lục</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Export Button -->
+      <div class="sidebar-footer">
+        <button id="btn-export-pdf" class="btn btn-primary btn-block">
+          <i class="fa-solid fa-file-pdf"></i> Xuất bản PDF đẹp
+        </button>
+        <div class="help-text">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>Khi bảng in mở ra, chọn <strong>Save as PDF</strong>. Nhớ bật <strong>Background graphics</strong> và tắt Headers/Footers.</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+      <!-- Editor Column -->
+      <section class="workspace-column editor-column">
+        <div class="column-header">
+          <div class="title-with-icon">
+            <i class="fa-solid fa-code"></i>
+            <h2 id="active-file-title">Chưa chọn file</h2>
+          </div>
+          <button id="btn-save-file" class="btn btn-secondary" disabled>
+            <i class="fa-regular fa-floppy-disk"></i> Lưu thay đổi
+          </button>
+        </div>
+        
+        <div class="editor-container" id="editor-drop-zone">
+          <!-- Editor Toolbar -->
+          <div class="editor-toolbar">
+            <button class="tb-btn" data-action="h2" title="Tiêu đề Slide (H2)">
+              <i class="fa-solid fa-heading"></i><sub style="font-size:8px;font-weight:bold;">2</sub>
+            </button>
+            <button class="tb-btn" data-action="h3" title="Tiêu đề con (H3)">
+              <i class="fa-solid fa-heading"></i><sub style="font-size:8px;font-weight:bold;">3</sub>
+            </button>
+            <div class="tb-separator"></div>
+            <button class="tb-btn" data-action="bold" title="Bôi đậm (Ctrl + B)">
+              <i class="fa-solid fa-bold"></i>
+            </button>
+            <button class="tb-btn" data-action="italic" title="In nghiêng (Ctrl + I)">
+              <i class="fa-solid fa-italic"></i>
+            </button>
+            <div class="tb-separator"></div>
+            <button class="tb-btn" data-action="quote" title="Trích dẫn blockquote">
+              <i class="fa-solid fa-quote-left"></i>
+            </button>
+            <button class="tb-btn" data-action="ul" title="Danh sách gạch đầu dòng">
+              <i class="fa-solid fa-list-ul"></i>
+            </button>
+            <button class="tb-btn" data-action="ol" title="Danh sách số thứ tự">
+              <i class="fa-solid fa-list-ol"></i>
+            </button>
+            <button class="tb-btn" data-action="table" title="Chèn bảng biểu">
+              <i class="fa-solid fa-table"></i>
+            </button>
+            <button class="tb-btn" data-action="hr" title="Ngắt slide (---)">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <div class="tb-separator"></div>
+            <button class="tb-btn" data-action="link" title="Chèn liên kết URL">
+              <i class="fa-solid fa-link"></i>
+            </button>
+            <button class="tb-btn" id="tb-btn-image" data-action="image" title="Tải lên & chèn ảnh">
+              <i class="fa-solid fa-image"></i>
+            </button>
+          </div>
+          
+          <textarea id="markdown-editor" placeholder="Chọn một file ở bên trái hoặc bắt đầu viết markdown, kéo thả ảnh trực tiếp tại đây..." disabled></textarea>
+          
+          <!-- Editor Status Bar -->
+          <div class="editor-status-bar">
+            <span id="editor-stats-words">Từ: 0</span>
+            <span id="editor-stats-chars">Kí tự: 0</span>
+            <span class="status-divider">|</span>
+            <span id="editor-status-info"><i class="fa-solid fa-circle-check"></i> Sẵn sàng</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Preview Column -->
+      <section class="workspace-column preview-column">
+        <div class="column-header">
+          <div class="title-with-icon">
+            <i class="fa-regular fa-eye"></i>
+            <h2>Bản xem trước trực quan</h2>
+          </div>
+          <div class="preview-controls" style="display:flex; gap:10px; align-items:center;">
+            <button id="btn-present" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; height: 32px; border-radius: 6px;" disabled>
+              <i class="fa-solid fa-play"></i> Trình chiếu
+            </button>
+            <span class="preview-badge" id="preview-mode-badge">Slide Deck (A4 Landscape)</span>
+          </div>
+        </div>
+        <div class="preview-container-scroll">
+          <div id="interactive-preview" class="preview-wrapper">
+            <!-- Dynamic Preview Content will be injected here -->
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Hidden file input for image uploads -->
+  <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
+
+  <!-- PRINT-ONLY VIEWPORT (SHOWN ONLY DURING PRINTING) -->
+  <div id="print-viewport" class="print-only">
+    <!-- Clean, un-scrolled elements for PDF rendering -->
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
