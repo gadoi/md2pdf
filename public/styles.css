@@ -118,10 +118,10 @@
   --quote-border: #ec4899;
 }
 
-/* Corporate Navy Theme (Clean Corporate Light - New) */
+/* Corporate Navy Theme (Clean Corporate Light) */
 .theme-corporate-navy {
   --bg-app: #f1f5f9;
-  --sidebar-bg: #0f172a; /* Slate-900 for dark professional contrast */
+  --sidebar-bg: #0f172a;
   --card-bg: #ffffff;
   --text-main: #0f172a;
   --text-muted: #64748b;
@@ -144,12 +144,12 @@
   --quote-border: #1d4ed8;
 }
 
-/* Emerald Executive Theme (Dark Emerald Luxury - New) */
+/* Emerald Executive Theme (Dark Emerald Luxury) */
 .theme-emerald-executive {
   --bg-app: linear-gradient(135deg, #022c22 0%, #064e3b 100%);
   --sidebar-bg: rgba(2, 44, 34, 0.8);
   --card-bg: rgba(255, 255, 255, 0.06);
-  --text-main: #fef08a; /* Soft Gold */
+  --text-main: #fef08a;
   --text-muted: #a7f3d0;
   --text-dark: #022c22;
   --accent: #eab308;
@@ -170,7 +170,7 @@
   --quote-border: #fbbf24;
 }
 
-/* Warm Minimalist Theme (Earthy Startup Light - New) */
+/* Warm Minimalist Theme (Earthy Startup Light) */
 .theme-warm-minimalist {
   --bg-app: #faf7f2;
   --sidebar-bg: #ece7df;
@@ -867,7 +867,7 @@ textarea:focus, button:focus {
   min-height: 1000px;
 }
 
-/* Document Cover Sheet Layout (New) */
+/* Document Cover Sheet Layout */
 .document-mode .doc-cover-page {
   min-height: 297mm; /* standard A4 height */
   display: flex;
@@ -931,7 +931,7 @@ textarea:focus, button:focus {
   color: var(--slide-header-color);
 }
 
-/* Section wrapping page structure for doc pages (New) */
+/* Section wrapping page structure for doc pages */
 .document-mode .doc-section-page {
   position: relative;
   background: var(--slide-card-bg);
@@ -947,7 +947,7 @@ textarea:focus, button:focus {
   break-after: page;
 }
 
-/* Dynamic Page footers inside Document Mode (New) */
+/* Dynamic Page footers inside Document Mode */
 .document-mode .doc-page-footer {
   position: absolute;
   bottom: 30px;
@@ -967,7 +967,7 @@ textarea:focus, button:focus {
   color: var(--accent);
 }
 
-/* Slide Deck Mode cards */
+/* Slide Deck Mode cards (UPGRADED - Comfort Padding & Centered Width Bounding) */
 .slides-container {
   display: flex;
   flex-direction: column;
@@ -982,7 +982,7 @@ textarea:focus, button:focus {
   border: 1px solid var(--slide-card-border);
   box-shadow: var(--slide-shadow);
   border-radius: var(--border-radius-lg);
-  padding: 48px;
+  padding: 60px 80px !important; /* Generous padded boundaries to prevent text touching edge */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -990,6 +990,13 @@ textarea:focus, button:focus {
   overflow: hidden;
   color: var(--slide-body-color);
   transition: var(--transition-smooth);
+}
+
+/* Bounding box for content inside slide */
+.slide .rendered-markdown {
+  max-width: 90%;
+  margin: 0 auto;
+  width: 100%;
 }
 
 /* Background grid effect on slides */
@@ -1117,7 +1124,7 @@ textarea:focus, button:focus {
   color: var(--slide-header-color);
 }
 
-/* Auto list column count inside slides if more than 3 elements (New) */
+/* Auto list column count inside slides if more than 3 elements */
 .slide .rendered-markdown ul.split-list,
 .slide .rendered-markdown ol.split-list {
   display: grid;
@@ -1126,7 +1133,7 @@ textarea:focus, button:focus {
   width: 100%;
 }
 
-/* Custom Table design (Premium look) */
+/* Custom Table design (Premium look & Auto Wrap Fix) */
 .rendered-markdown table,
 .slide table {
   width: 100%;
@@ -1136,6 +1143,10 @@ textarea:focus, button:focus {
   text-align: left;
   border-radius: var(--border-radius-sm);
   overflow: hidden;
+  table-layout: auto;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
 }
 
 .rendered-markdown th,
@@ -1161,6 +1172,9 @@ textarea:focus, button:focus {
   padding: 12px 16px;
   border-bottom: 1px solid var(--border-color);
   color: var(--slide-body-color);
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
 }
 
 .rendered-markdown tr:last-child td,
@@ -1204,8 +1218,8 @@ textarea:focus, button:focus {
 /* Image Styling */
 .rendered-markdown img,
 .slide img {
-  max-width: 85%;
-  max-height: 220px;
+  max-width: 80%;
+  max-height: 200px; /* slightly smaller to accommodate larger slide paddings */
   object-fit: contain;
   border-radius: var(--border-radius-md);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35), 0 0 1px var(--border-color);
@@ -1442,7 +1456,7 @@ textarea:focus, button:focus {
 
 
 /* ==========================================================================
-   6.2 BROWSER FULLSCREEN PRESENTER MODE (NEW)
+   6.2 BROWSER FULLSCREEN PRESENTER MODE (UPGRADED - Spacious padding)
    ========================================================================== */
 
 /* Fullscreen wrapper layout */
@@ -1477,11 +1491,18 @@ textarea:focus, button:focus {
   border-radius: 0 !important;
   border: none !important;
   box-shadow: none !important;
-  display: none !important; /* Hide all slides, show active only */
+  display: none !important;
   animation: slideTransitionFade 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 5% 8% !important; /* Larger viewport margins */
+  padding: 8% 12% !important; /* Spacious margins on all sides to prevent text close to border */
   justify-content: center !important;
   box-sizing: border-box !important;
+}
+
+/* Width bounding box in fullscreen */
+.preview-wrapper:fullscreen .slide .rendered-markdown {
+  max-width: 90% !important;
+  margin: 0 auto !important;
+  width: 100% !important;
 }
 
 .preview-wrapper:fullscreen .slide.active-fullscreen-slide {
@@ -1493,45 +1514,45 @@ textarea:focus, button:focus {
   to { opacity: 1; transform: scale(1); }
 }
 
-/* Fullscreen sizing overrides using vw/vh for auto-scaling text */
+/* Fullscreen sizing overrides */
 .preview-wrapper:fullscreen .slide h1 {
   font-size: 5.5vw !important;
   margin-bottom: 3vh !important;
 }
 .preview-wrapper:fullscreen .slide h2 {
-  font-size: 3.5vw !important;
+  font-size: 3.2vw !important; /* slightly smaller to fit nicely within larger padding */
   margin-bottom: 2vh !important;
 }
 .preview-wrapper:fullscreen .slide h3 {
-  font-size: 2.5vw !important;
+  font-size: 2.2vw !important;
 }
 .preview-wrapper:fullscreen .slide p {
-  font-size: 1.8vw !important;
+  font-size: 1.6vw !important;
   margin-bottom: 2vh !important;
 }
 .preview-wrapper:fullscreen .slide li {
-  font-size: 1.8vw !important;
+  font-size: 1.6vw !important;
 }
 .preview-wrapper:fullscreen .slide table {
-  font-size: 1.4vw !important;
+  font-size: 1.2vw !important;
 }
 .preview-wrapper:fullscreen .slide blockquote p {
-  font-size: 2.2vw !important;
+  font-size: 2vw !important;
 }
 .preview-wrapper:fullscreen .slide img {
-  max-height: 48vh !important;
+  max-height: 40vh !important; /* smaller image height to give page breath */
   margin: 3vh auto !important;
 }
 .preview-wrapper:fullscreen .slide .slide-brand-logo,
 .preview-wrapper:fullscreen .slide .slide-footer-marker {
-  font-size: 1.2vw !important;
-  bottom: 4vh !important;
+  font-size: 1vw !important;
+  bottom: 5vh !important; /* moved slightly higher to clear margins */
 }
 .preview-wrapper:fullscreen .slide .slide-brand-logo {
-  left: 6vw !important;
+  left: 8vw !important;
 }
 .preview-wrapper:fullscreen .slide .slide-footer-marker {
-  right: 6vw !important;
+  right: 8vw !important;
 }
 
 
@@ -1601,7 +1622,7 @@ textarea:focus, button:focus {
       page-break-after: always !important;
       break-after: page !important;
       box-sizing: border-box !important;
-      padding: 30mm 28mm !important; /* Balanced margins for slides with images */
+      padding: 35mm 32mm !important; /* Balanced margins to prevent text stretching to edges in print */
       position: relative !important;
       overflow: hidden !important;
       display: flex !important;
@@ -1614,6 +1635,13 @@ textarea:focus, button:focus {
       /* Ensure color themes render faithfully in print */
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
+    }
+
+    /* Print slide content wrapper restriction */
+    .slide .rendered-markdown {
+      max-width: 90% !important;
+      margin: 0 auto !important;
+      width: 100% !important;
     }
 
     /* Force backgrounds for print */
@@ -1721,7 +1749,7 @@ textarea:focus, button:focus {
       font-size: 16pt !important;
     }
     .slide img {
-      max-height: 80mm !important;
+      max-height: 75mm !important; /* slightly smaller in print to guarantee margins */
       max-width: 90% !important;
       margin: 5mm auto !important;
       box-shadow: 0 4mm 10mm rgba(0,0,0,0.3) !important;
@@ -1770,7 +1798,7 @@ textarea:focus, button:focus {
     
     .document-mode .doc-section-page {
       width: 170mm !important;
-      height: 257mm !important; /* height adjusted for print margins */
+      height: 257mm !important;
       page-break-after: always !important;
       break-after: page !important;
       box-sizing: border-box !important;
@@ -1778,7 +1806,7 @@ textarea:focus, button:focus {
       border: none !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      padding: 0 0 20mm 0 !important; /* Clear bottom margins for headers/footers */
+      padding: 0 0 20mm 0 !important;
     }
     
     .document-mode .doc-page-footer {
@@ -1812,7 +1840,7 @@ textarea:focus, button:focus {
     
     .rendered-markdown h2 {
       font-size: 18pt !important;
-      margin-top: 0 !important; /* start clean on H2 page breaks */
+      margin-top: 0 !important;
       margin-bottom: 10pt !important;
       page-break-after: avoid !important;
       break-after: avoid !important;
