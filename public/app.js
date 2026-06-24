@@ -191,27 +191,36 @@ function updateStats() {
 
 // Markdown to Slide Converter Engine
 function splitMarkdownIntoSlides(markdown) {
-  if (markdown.match(/\r?\n---\r?\n/)) {
-    return markdown.split(/\r?\n---\r?\n/).map(s => s.trim()).filter(Boolean);
-  }
-  
   const lines = markdown.split(/\r?\n/);
   const slides = [];
   let currentSlideLines = [];
   
   for (let line of lines) {
-    if (line.startsWith('## ') || line.startsWith('##\t') || line === '##') {
+    const isSeparator = line.trim() === '---';
+    const isHeading = line.startsWith('## ') || line.startsWith('##\t') || line === '##';
+    
+    if (isSeparator || isHeading) {
       if (currentSlideLines.length > 0) {
-        slides.push(currentSlideLines.join('\n').trim());
+        const slideContent = currentSlideLines.join('\n').trim();
+        if (slideContent) {
+          slides.push(slideContent);
+        }
       }
-      currentSlideLines = [line];
+      if (isHeading) {
+        currentSlideLines = [line];
+      } else {
+        currentSlideLines = [];
+      }
     } else {
       currentSlideLines.push(line);
     }
   }
   
   if (currentSlideLines.length > 0) {
-    slides.push(currentSlideLines.join('\n').trim());
+    const slideContent = currentSlideLines.join('\n').trim();
+    if (slideContent) {
+      slides.push(slideContent);
+    }
   }
   
   return slides.filter(Boolean);
