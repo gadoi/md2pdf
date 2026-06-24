@@ -741,6 +741,40 @@ textarea:focus, button:focus {
   margin: 0 6px;
 }
 
+.tb-select {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--border-radius-sm);
+  padding: 0 8px;
+  font-size: 11px;
+  height: 32px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.tb-select:hover {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.theme-classic-ivory .tb-select,
+.theme-warm-minimalist .tb-select,
+.theme-corporate-navy .tb-select {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.theme-classic-ivory .tb-select:hover,
+.theme-warm-minimalist .tb-select:hover,
+.theme-corporate-navy .tb-select:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--accent);
+}
+
 /* Textarea customization */
 #markdown-editor {
   width: 100%;

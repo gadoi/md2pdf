@@ -765,6 +765,9 @@ function setupToolbarListeners() {
         case 'link':
           insertTextAtCursor('[Mô tả liên kết](', ')');
           break;
+        case 'insert-toc':
+          insertTextAtCursor('<a href="#anchor-id" class="toc-link">\n  <span class="toc-title">Tiêu đề mục lục</span>\n  <span class="toc-dots"></span>\n  <span class="toc-page">Số trang</span>\n</a>', '');
+          break;
         case 'image':
           imageUploadInput.click();
           break;
@@ -784,6 +787,16 @@ function setupToolbarListeners() {
     tbColorPicker.addEventListener('change', (e) => {
       const color = e.target.value;
       insertTextAtCursor(`<span style="color: ${color}">`, '</span>');
+    });
+  }
+  
+  const tbFontSizeSelect = document.getElementById('tb-font-size-select');
+  if (tbFontSizeSelect) {
+    tbFontSizeSelect.addEventListener('change', (e) => {
+      const size = e.target.value;
+      if (!size) return;
+      insertTextAtCursor(`<span style="font-size: ${size}">`, '</span>');
+      tbFontSizeSelect.value = ''; // Reset selector
     });
   }
   
