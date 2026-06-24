@@ -104,6 +104,14 @@
         </div>
       </div>
 
+      <!-- Section: PDF Editing -->
+      <div class="sidebar-section">
+        <h3><i class="fa-solid fa-file-pdf"></i> Công cụ chỉnh sửa PDF</h3>
+        <button id="btn-open-pdf-editor" class="btn btn-secondary btn-block">
+          <i class="fa-solid fa-pen-nib"></i> Chỉnh sửa & Ký tên PDF
+        </button>
+      </div>
+
       <!-- Export Button -->
       <div class="sidebar-footer">
         <button id="btn-export-pdf" class="btn btn-primary btn-block">
@@ -214,6 +222,102 @@
     <!-- Clean, un-scrolled elements for PDF rendering -->
   </div>
 
+  <!-- PDF EDITOR MODAL -->
+  <div id="pdf-editor-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fa-solid fa-pen-nib"></i> Markdown2PDF Kit — Trình Biên Tập & Ký Tên PDF</h2>
+        <button id="btn-close-pdf-editor" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Step 1: Upload PDF -->
+        <div class="modal-step" id="pdf-step-1">
+          <h3>Bước 1: Nạp tệp PDF cần chỉnh sửa</h3>
+          <div class="pdf-upload-zone" id="pdf-upload-zone">
+            <i class="fa-solid fa-file-pdf pdf-upload-icon"></i>
+            <p>Kéo thả tệp PDF đã xuất bản của bạn vào đây hoặc click để chọn tệp</p>
+            <input type="file" id="pdf-file-input" accept="application/pdf" style="display: none;">
+          </div>
+          <div id="pdf-file-info" class="pdf-file-info" style="display: none;">
+            <i class="fa-solid fa-check-circle"></i> Đang chọn tệp: <span id="pdf-file-name">document.pdf</span> (<span id="pdf-file-size">0 KB</span>)
+          </div>
+        </div>
+
+        <!-- Step 2: Configure Changes (Initially Hidden) -->
+        <div class="modal-step" id="pdf-step-2" style="display: none;">
+          <h3>Bước 2: Cấu hình chỉnh sửa & ký tên</h3>
+          <div class="pdf-editor-tabs">
+            <button class="pdf-tab-btn active" data-tab="pdf-tab-watermark"><i class="fa-solid fa-copyright"></i> Đóng dấu bản quyền</button>
+            <button class="pdf-tab-btn" data-tab="pdf-tab-sign"><i class="fa-solid fa-signature"></i> Chữ ký điện tử</button>
+            <button class="pdf-tab-btn" data-tab="pdf-tab-merge"><i class="fa-solid fa-plus-circle"></i> Ghép thêm PDF</button>
+          </div>
+
+          <div class="pdf-tab-content active" id="pdf-tab-watermark">
+            <div class="form-group">
+              <label for="pdf-watermark-text">Nội dung dấu bản quyền (Watermark Text):</label>
+              <input type="text" id="pdf-watermark-text" placeholder="Ví dụ: DỰ THẢO - CONFIDENTIAL">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="pdf-watermark-color">Màu sắc:</label>
+                <select id="pdf-watermark-color">
+                  <option value="red" selected>Màu đỏ (Nhạt)</option>
+                  <option value="grey">Màu xám (Mờ)</option>
+                  <option value="blue">Màu xanh dương (Mờ)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="pdf-watermark-opacity">Độ mờ (Opacity):</label>
+                <input type="range" id="pdf-watermark-opacity" min="0.1" max="0.8" step="0.05" value="0.2">
+              </div>
+            </div>
+          </div>
+
+          <div class="pdf-tab-content" id="pdf-tab-sign" style="display: none;">
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Vẽ chữ ký của bạn vào khung bên dưới, sau đó chọn vị trí cần chèn trên tài liệu.</p>
+            <div class="signature-canvas-container">
+              <canvas id="signature-canvas" width="400" height="150"></canvas>
+              <button id="btn-clear-signature" class="btn btn-secondary" style="margin-top: 6px; padding: 6px 12px; font-size: 11px;"><i class="fa-solid fa-eraser"></i> Xóa vẽ chữ ký</button>
+            </div>
+            <div class="form-row" style="margin-top: 12px;">
+              <div class="form-group">
+                <label for="pdf-sign-page">Chèn vào trang số:</label>
+                <input type="number" id="pdf-sign-page" min="1" value="1" style="width: 80px;">
+                <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">Điền 999 để chèn vào trang cuối</span>
+              </div>
+              <div class="form-group">
+                <label for="pdf-sign-pos">Vị trí chèn:</label>
+                <select id="pdf-sign-pos">
+                  <option value="bottom-right" selected>Góc dưới cùng bên phải</option>
+                  <option value="bottom-left">Góc dưới cùng bên trái</option>
+                  <option value="center">Chính giữa trang</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="pdf-tab-content" id="pdf-tab-merge" style="display: none;">
+            <label>Nạp thêm tệp PDF cần ghép vào cuối file hiện tại (Phụ lục, brochure...):</label>
+            <div class="pdf-merge-zone" id="pdf-merge-zone">
+              <i class="fa-solid fa-file-circle-plus pdf-upload-icon" style="font-size: 32px;"></i>
+              <p>Click chọn file PDF để ghép vào cuối</p>
+              <input type="file" id="pdf-merge-input" accept="application/pdf" style="display: none;">
+            </div>
+            <div id="pdf-merge-info" class="pdf-file-info" style="display: none; background: rgba(255,255,255,0.05);">
+              <i class="fa-solid fa-plus-circle"></i> Sẽ ghép thêm: <span id="pdf-merge-name">appendix.pdf</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-process-pdf" class="btn btn-primary" disabled><i class="fa-solid fa-wand-magic-sparkles"></i> Tiến hành xử lý & Tải về</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load pdf-lib CDN library -->
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <!-- Main Application Script -->
   <script src="app.js"></script>
 </body>
 </html>

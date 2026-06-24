@@ -52,6 +52,7 @@ async function init() {
   setupDragAndDrop();
   setupAdvancedListeners();
   setupPresenterMode();
+  setupPdfEditor();
   await fetchFiles();
   
   // Select first file if available
@@ -359,7 +360,7 @@ function renderPreview() {
           <h1>${title}</h1>
           <div class="doc-cover-subtitle">Tài liệu giới thiệu giải pháp & Sales Kit</div>
           <div class="doc-cover-meta">
-            ${metaStrings.join('') || '<span>Đơn vị phát hành: <strong>Markdown2PDF Kit</strong></span>'}
+            ${metaStrings.join('')}
             <span>Ngày xuất bản: <strong>${new Date().toLocaleDateString('vi-VN')}</strong></span>
           </div>
         </div>
@@ -436,7 +437,7 @@ function renderPreview() {
             </ul>
           </div>
           <div class="doc-page-footer">
-            <span class="doc-page-footer-title">Markdown2PDF</span>
+            <span></span>
             <span>Trang 2</span>
           </div>
         </div>
@@ -463,7 +464,7 @@ function renderPreview() {
             ${elementsHtml}
           </div>
           <div class="doc-page-footer">
-            <span class="doc-page-footer-title">Markdown2PDF Kit</span>
+            <span></span>
             <span>Trang ${pageNum}</span>
           </div>
         </div>
@@ -868,6 +869,317 @@ function setupEventListeners() {
   // Initially disable elements before file selection
   toolbarButtons.forEach(btn => btn.disabled = true);
   btnPresentEl.disabled = true;
+}
+
+// PDF Editor Kit Variables
+let originalPdfBytes = null;
+let originalPdfFile = null;
+let mergePdfBytes = null;
+let signatureDrawing = false;
+let sigCanvas, sigCtx;
+
+function setupPdfEditor() {
+  const modal = document.getElementById('pdf-editor-modal');
+  const btnOpen = document.getElementById('btn-open-pdf-editor');
+  const btnClose = document.getElementById('btn-close-pdf-editor');
+  
+  const uploadZone = document.getElementById('pdf-upload-zone');
+  const fileInput = document.getElementById('pdf-file-input');
+  const fileInfo = document.getElementById('pdf-file-info');
+  const fileNameSpan = document.getElementById('pdf-file-name');
+  const fileSizeSpan = document.getElementById('pdf-file-size');
+  
+  const step2 = document.getElementById('pdf-step-2');
+  const btnProcess = document.getElementById('btn-process-pdf');
+  
+  const tabButtons = document.querySelectorAll('.pdf-tab-btn');
+  const tabContents = document.querySelectorAll('.pdf-tab-content');
+  
+  const mergeZone = document.getElementById('pdf-merge-zone');
+  const mergeInput = document.getElementById('pdf-merge-input');
+  const mergeInfo = document.getElementById('pdf-merge-info');
+  const mergeNameSpan = document.getElementById('pdf-merge-name');
+  
+  // Signature Canvas drawing logic
+  sigCanvas = document.getElementById('signature-canvas');
+  if (sigCanvas) {
+    sigCtx = sigCanvas.getContext('2d');
+    setupSignatureCanvas();
+  }
+  
+  // Open modal
+  btnOpen.addEventListener('click', () => {
+    modal.style.display = 'flex';
+    resetPdfEditorState();
+  });
+  
+  // Close modal
+  const closeModal = () => {
+    modal.style.display = 'none';
+  };
+  btnClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+  
+  // Tab Switcher
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabButtons.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.style.display = 'none');
+      
+      btn.classList.add('active');
+      const tabId = btn.getAttribute('data-tab');
+      document.getElementById(tabId).style.display = 'block';
+    });
+  });
+  
+  // File upload click handlers
+  uploadZone.addEventListener('click', () => fileInput.click());
+  mergeZone.addEventListener('click', () => mergeInput.click());
+  
+  // Drag & drop for upload zone
+  uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.style.borderColor = 'var(--accent)';
+  });
+  uploadZone.addEventListener('dragleave', () => {
+    uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+  });
+  uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+    if (e.dataTransfer.files.length > 0) {
+      handlePdfFileSelect(e.dataTransfer.files[0]);
+    }
+  });
+  
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      handlePdfFileSelect(e.target.files[0]);
+    }
+  });
+  
+  mergeInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      handlePdfMergeSelect(e.target.files[0]);
+    }
+  });
+  
+  // Clear signature button
+  document.getElementById('btn-clear-signature').addEventListener('click', (e) => {
+    e.preventDefault();
+    clearSignatureCanvas();
+  });
+  
+  // Process PDF button
+  btnProcess.addEventListener('click', async () => {
+    if (!originalPdfBytes) return;
+    
+    btnProcess.disabled = true;
+    btnProcess.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
+    
+    try {
+      // Load original PDF document
+      const { PDFDocument, rgb, degrees } = PDFLib;
+      const pdfDoc = await PDFDocument.load(originalPdfBytes);
+      
+      // 1. WATERMARK STAMPING
+      const wmText = document.getElementById('pdf-watermark-text').value.trim();
+      if (wmText) {
+        const pages = pdfDoc.getPages();
+        const helveticaFont = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+        const colorVal = document.getElementById('pdf-watermark-color').value;
+        const opacityVal = parseFloat(document.getElementById('pdf-watermark-opacity').value);
+        
+        let wmColor = rgb(0.9, 0.2, 0.2); // red default
+        if (colorVal === 'grey') wmColor = rgb(0.5, 0.5, 0.5);
+        else if (colorVal === 'blue') wmColor = rgb(0.2, 0.2, 0.8);
+        
+        pages.forEach(page => {
+          const { width, height } = page.getSize();
+          // Draw watermark diagonally across center of the page
+          page.drawText(wmText, {
+            x: width / 2 - 180,
+            y: height / 2 - 50,
+            size: 40,
+            font: helveticaFont,
+            color: wmColor,
+            opacity: opacityVal,
+            rotate: degrees(35)
+          });
+        });
+      }
+      
+      // 2. SIGNATURE STAMPING
+      if (!isSignatureCanvasEmpty()) {
+        const sigDataUrl = sigCanvas.toDataURL('image/png');
+        const sigImage = await pdfDoc.embedPng(sigDataUrl);
+        const pages = pdfDoc.getPages();
+        
+        let targetPageIdx = parseInt(document.getElementById('pdf-sign-page').value) - 1;
+        if (isNaN(targetPageIdx) || targetPageIdx < 0) targetPageIdx = 0;
+        if (targetPageIdx >= pages.length || targetPageIdx === 998) {
+          targetPageIdx = pages.length - 1;
+        }
+        
+        const page = pages[targetPageIdx];
+        const { width, height } = page.getSize();
+        
+        const sigWidth = 150;
+        const sigHeight = (sigCanvas.height / sigCanvas.width) * sigWidth;
+        const posVal = document.getElementById('pdf-sign-pos').value;
+        
+        let x = width - sigWidth - 40;
+        let y = 40;
+        
+        if (posVal === 'bottom-left') {
+          x = 40;
+        } else if (posVal === 'center') {
+          x = (width - sigWidth) / 2;
+          y = (height - sigHeight) / 2;
+        }
+        
+        page.drawImage(sigImage, {
+          x: x,
+          y: y,
+          width: sigWidth,
+          height: sigHeight
+        });
+      }
+      
+      // 3. MERGE PDF FILES
+      if (mergePdfBytes) {
+        const mergeDoc = await PDFDocument.load(mergePdfBytes);
+        const copiedPages = await pdfDoc.copyPages(mergeDoc, mergeDoc.getPageIndices());
+        copiedPages.forEach(p => pdfDoc.addPage(p));
+      }
+      
+      // Save and Download
+      const finalPdfBytes = await pdfDoc.save();
+      const blob = new Blob([finalPdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'edited_' + (originalPdfFile ? originalPdfFile.name : 'document.pdf');
+      a.click();
+      
+      alert('Đã xử lý tệp PDF và tự động tải về thành công!');
+      closeModal();
+    } catch (err) {
+      console.error(err);
+      alert('Lỗi xử lý file PDF: ' + err.message);
+    } finally {
+      btnProcess.disabled = false;
+      btnProcess.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Tiến hành xử lý & Tải về';
+    }
+  });
+}
+
+function handlePdfFileSelect(file) {
+  if (!file || file.type !== 'application/pdf') {
+    alert('Chỉ chấp nhận tệp định dạng PDF!');
+    return;
+  }
+  
+  originalPdfFile = file;
+  document.getElementById('pdf-file-name').textContent = file.name;
+  document.getElementById('pdf-file-size').textContent = Math.round(file.size / 1024) + ' KB';
+  document.getElementById('pdf-file-info').style.display = 'flex';
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    originalPdfBytes = e.target.result;
+    document.getElementById('pdf-step-2').style.display = 'block';
+    document.getElementById('btn-process-pdf').disabled = false;
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function handlePdfMergeSelect(file) {
+  if (!file || file.type !== 'application/pdf') {
+    alert('Chỉ chấp nhận tệp định dạng PDF!');
+    return;
+  }
+  
+  document.getElementById('pdf-merge-name').textContent = file.name;
+  document.getElementById('pdf-merge-info').style.display = 'flex';
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    mergePdfBytes = e.target.result;
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function setupSignatureCanvas() {
+  const getMousePos = (e) => {
+    const rect = sigCanvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top
+    };
+  };
+  
+  const startDrawing = (e) => {
+    e.preventDefault();
+    signatureDrawing = true;
+    const pos = getMousePos(e);
+    sigCtx.beginPath();
+    sigCtx.moveTo(pos.x, pos.y);
+    sigCtx.lineWidth = 2;
+    sigCtx.lineCap = 'round';
+    sigCtx.strokeStyle = '#000000';
+  };
+  
+  const draw = (e) => {
+    if (!signatureDrawing) return;
+    e.preventDefault();
+    const pos = getMousePos(e);
+    sigCtx.lineTo(pos.x, pos.y);
+    sigCtx.stroke();
+  };
+  
+  const stopDrawing = () => {
+    signatureDrawing = false;
+  };
+  
+  sigCanvas.addEventListener('mousedown', startDrawing);
+  sigCanvas.addEventListener('mousemove', draw);
+  sigCanvas.addEventListener('mouseup', stopDrawing);
+  sigCanvas.addEventListener('mouseleave', stopDrawing);
+  
+  sigCanvas.addEventListener('touchstart', startDrawing, { passive: false });
+  sigCanvas.addEventListener('touchmove', draw, { passive: false });
+  sigCanvas.addEventListener('touchend', stopDrawing);
+}
+
+function clearSignatureCanvas() {
+  if (sigCanvas) {
+    sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+  }
+}
+
+function isSignatureCanvasEmpty() {
+  if (!sigCanvas) return true;
+  const buffer = new Uint32Array(sigCtx.getImageData(0, 0, sigCanvas.width, sigCanvas.height).data.buffer);
+  return !buffer.some(color => color !== 0);
+}
+
+function resetPdfEditorState() {
+  originalPdfBytes = null;
+  originalPdfFile = null;
+  mergePdfBytes = null;
+  document.getElementById('pdf-file-info').style.display = 'none';
+  document.getElementById('pdf-step-2').style.display = 'none';
+  document.getElementById('pdf-merge-info').style.display = 'none';
+  document.getElementById('btn-process-pdf').disabled = true;
+  document.getElementById('pdf-watermark-text').value = '';
+  document.getElementById('pdf-file-input').value = '';
+  document.getElementById('pdf-merge-input').value = '';
+  clearSignatureCanvas();
 }
 
 // Start application
