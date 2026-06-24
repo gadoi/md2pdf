@@ -197,7 +197,8 @@ function splitMarkdownIntoSlides(markdown) {
   
   for (let line of lines) {
     const isSeparator = line.trim() === '---';
-    const isHeading = line.startsWith('## ') || line.startsWith('##\t') || line === '##';
+    const isHeading = line.startsWith('## ') || line.startsWith('##\t') || line === '##' || 
+                      line.startsWith('# ') || line.startsWith('#\t') || line === '#';
     
     if (isSeparator || isHeading) {
       if (currentSlideLines.length > 0) {

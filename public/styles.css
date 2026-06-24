@@ -1541,6 +1541,15 @@ textarea:focus, button:focus {
 .preview-wrapper:fullscreen .slide table {
   font-size: 1vw !important;
 }
+.preview-wrapper:fullscreen .slide pre {
+  font-size: 0.9vw !important;
+  padding: 10px !important;
+  margin: 1.5vh 0 !important;
+  max-width: 100% !important;
+}
+.preview-wrapper:fullscreen .slide code {
+  font-size: 0.9vw !important;
+}
 .preview-wrapper:fullscreen .slide blockquote p {
   font-size: 1.5vw !important;
 }
