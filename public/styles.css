@@ -858,13 +858,12 @@ textarea:focus, button:focus {
 
 /* Document Mode layout (A4 sheet styling) */
 .document-mode .rendered-markdown {
-  background: var(--slide-card-bg);
-  border: 1px solid var(--slide-card-border);
-  box-shadow: var(--slide-shadow);
-  border-radius: var(--border-radius-md);
-  padding: 50px;
-  color: var(--slide-body-color);
-  min-height: 1000px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  color: inherit;
+  min-height: auto;
 }
 
 /* Document Cover Sheet Layout */
@@ -874,7 +873,7 @@ textarea:focus, button:focus {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 60px;
+  padding: 60px 80px;
   position: relative;
   border-bottom: 2px solid var(--border-color);
   page-break-after: always;
@@ -938,7 +937,7 @@ textarea:focus, button:focus {
   border: 1px solid var(--slide-card-border);
   box-shadow: var(--slide-shadow);
   border-radius: var(--border-radius-md);
-  padding: 50px 50px 80px 50px; /* larger bottom padding for footer space */
+  padding: 60px 80px 100px 80px; /* luxurious breathing space margins */
   color: var(--slide-body-color);
   min-height: 297mm; /* A4 size aspect scale */
   box-sizing: border-box;
@@ -947,12 +946,18 @@ textarea:focus, button:focus {
   break-after: page;
 }
 
+.document-mode .doc-section-page .rendered-markdown {
+  max-width: 90%;
+  margin: 0 auto;
+  width: 100%;
+}
+
 /* Dynamic Page footers inside Document Mode */
 .document-mode .doc-page-footer {
   position: absolute;
-  bottom: 30px;
-  left: 50px;
-  right: 50px;
+  bottom: 40px;
+  left: 80px;
+  right: 80px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1794,7 +1799,7 @@ textarea:focus, button:focus {
       flex-direction: column !important;
       justify-content: center !important;
       align-items: center !important;
-      padding: 30mm 20mm !important;
+      padding: 35mm 30mm !important;
       margin: 0 !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
@@ -1810,17 +1815,23 @@ textarea:focus, button:focus {
       border: none !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      padding: 25mm 20mm 35mm 20mm !important;
+      padding: 30mm 30mm 40mm 30mm !important;
       margin: 0 !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
     
+    .document-mode .doc-section-page .rendered-markdown {
+      max-width: 90% !important;
+      margin: 0 auto !important;
+      width: 100% !important;
+    }
+    
     .document-mode .doc-page-footer {
       position: absolute !important;
       bottom: 15mm !important;
-      left: 20mm !important;
-      right: 20mm !important;
+      left: 30mm !important;
+      right: 30mm !important;
       border-top: 1px solid var(--border-color) !important;
       padding-top: 4mm !important;
       display: flex !important;
