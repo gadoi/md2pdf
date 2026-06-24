@@ -946,6 +946,41 @@ textarea:focus, button:focus {
   break-after: page;
 }
 
+/* Chapter Title Pages (H1 section headers) */
+.document-mode .doc-section-page.chapter-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 60px 80px;
+}
+
+.document-mode .doc-section-page.chapter-page .rendered-markdown {
+  max-width: 85%;
+}
+
+.document-mode .doc-section-page.chapter-page h1 {
+  font-size: 36px;
+  text-align: center;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.document-mode .doc-section-page.chapter-page::after {
+  content: '';
+  display: block;
+  width: 100px;
+  height: 4px;
+  background: var(--accent-gradient);
+  margin-top: 24px;
+  border-radius: 2px;
+}
+
 .document-mode .doc-section-page .rendered-markdown {
   max-width: 90%;
   margin: 0 auto;
@@ -1596,19 +1631,30 @@ textarea:focus, button:focus {
   
   .print-only {
     display: block !important;
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: static !important;
     width: 100% !important;
     height: auto !important;
     background: transparent !important;
   }
+
+  /* Reset print container to blocks, preventing flexbox page-break bugs */
+  .print-only .slides-container,
+  .print-only .document-mode {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
   
   html, body {
-    width: 100%;
-    height: auto;
-    background: transparent !important;
-    color: #000000 !important;
+    width: 100% !important;
+    height: auto !important;
+    background: var(--preview-bg) !important; /* Inherit background colors from theme preview */
+    color: var(--slide-body-color) !important;
     overflow: visible !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -1618,16 +1664,10 @@ textarea:focus, button:focus {
 
   /* 8.2 SLIDE PRESENTATION (LANDSCAPE) */
   .layout-slides-active {
-    /* Set landscape page size */
+    /* Set landscape page size and remove margins for full bleed */
     @page {
       size: A4 landscape;
       margin: 0 !important;
-    }
-    
-    .print-only {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 0 !important;
     }
     
     .slide {
@@ -1636,7 +1676,7 @@ textarea:focus, button:focus {
       page-break-after: always !important;
       break-after: page !important;
       box-sizing: border-box !important;
-      padding: 35mm 32mm !important; /* Balanced margins to prevent text stretching to edges in print */
+      padding: 25mm 30mm !important; /* Balanced margins to prevent text stretching to edges in print */
       position: relative !important;
       overflow: hidden !important;
       display: flex !important;
@@ -1645,6 +1685,9 @@ textarea:focus, button:focus {
       border: none !important;
       border-radius: 0 !important;
       box-shadow: none !important;
+      margin: 0 !important;
+      background: var(--slide-card-bg) !important;
+      color: var(--slide-body-color) !important;
       
       /* Ensure color themes render faithfully in print */
       -webkit-print-color-adjust: exact !important;
@@ -1658,112 +1701,77 @@ textarea:focus, button:focus {
       width: 100% !important;
     }
 
-    /* Force backgrounds for print */
-    &.theme-midnight-tech .slide {
-      background: #0f172a !important;
-      background: linear-gradient(135deg, #0b0f19 0%, #111827 50%, #1e1b4b 100%) !important;
-      color: #cbd5e1 !important;
-    }
-    &.theme-midnight-tech .slide h1, &.theme-midnight-tech .slide h2, &.theme-midnight-tech .slide h3 {
-      color: #f8fafc !important;
-    }
-    
-    &.theme-classic-ivory .slide {
-      background: #fcfbfa !important;
-      color: #292524 !important;
-    }
-    &.theme-classic-ivory .slide h1, &.theme-classic-ivory .slide h2, &.theme-classic-ivory .slide h3 {
-      color: #0f5a47 !important;
-    }
-    
-    &.theme-nordic-aurora .slide {
-      background: linear-gradient(135deg, #021f19 0%, #022c22 100%) !important;
-      color: #ecfdf5 !important;
-    }
-    &.theme-nordic-aurora .slide h1, &.theme-nordic-aurora .slide h2, &.theme-nordic-aurora .slide h3 {
-      color: #34d399 !important;
-    }
-    
-    &.theme-vibrant-sunset .slide {
-      background: linear-gradient(135deg, #18153f 0%, #be185d 100%) !important;
-      color: #f1f5f9 !important;
-    }
-    &.theme-vibrant-sunset .slide h1, &.theme-vibrant-sunset .slide h2, &.theme-vibrant-sunset .slide h3 {
-      color: #ffffff !important;
-    }
-    
-    &.theme-corporate-navy .slide {
-      background: #ffffff !important;
-      color: #334155 !important;
-    }
-    &.theme-corporate-navy .slide h1, &.theme-corporate-navy .slide h2, &.theme-corporate-navy .slide h3 {
-      color: #0f172a !important;
-    }
-    
-    &.theme-emerald-executive .slide {
-      background: linear-gradient(135deg, #022c22 0%, #064e3b 100%) !important;
-      color: #ecfdf5 !important;
-    }
-    &.theme-emerald-executive .slide h1, &.theme-emerald-executive .slide h2, &.theme-emerald-executive .slide h3 {
-      color: #fbbf24 !important;
-    }
-    
-    &.theme-warm-minimalist .slide {
-      background: #faf7f2 !important;
-      color: #404040 !important;
-    }
-    &.theme-warm-minimalist .slide h1, &.theme-warm-minimalist .slide h2, &.theme-warm-minimalist .slide h3 {
-      color: #78350f !important;
-    }
-    
     /* Center title card elements */
     .slide.title-slide {
       align-items: center !important;
       text-align: center !important;
       justify-content: center !important;
+      background: linear-gradient(135deg, rgba(30, 27, 75, 0.4) 0%, rgba(15, 23, 42, 0.7) 100%) !important;
+      border: 2px solid var(--accent) !important;
     }
+    
     .slide.title-slide h1 {
-      font-size: 40pt !important;
+      font-size: 36pt !important;
       line-height: 1.2 !important;
+      background: var(--accent-gradient) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      margin-bottom: 6mm !important;
     }
     .slide.title-slide::after {
       content: '' !important;
       display: block !important;
       width: 40mm !important;
-      height: 1mm !important;
+      height: 1.2mm !important;
+      background: var(--accent-gradient) !important;
       margin-top: 5mm !important;
+      border-radius: 2px !important;
     }
     
+    .slide h1 {
+      color: var(--slide-header-color) !important;
+    }
     .slide h2 {
-      font-size: 26pt !important;
-      margin-bottom: 8mm !important;
+      font-size: 24pt !important;
+      margin-bottom: 6mm !important;
       padding-bottom: 2mm !important;
+      color: var(--slide-header-color) !important;
+      border-bottom: 2px solid var(--border-color) !important;
     }
     .slide h3 {
       font-size: 18pt !important;
       margin-top: 4mm !important;
+      color: var(--slide-header-color) !important;
     }
     .slide p {
-      font-size: 15pt !important;
+      font-size: 14pt !important;
       margin-bottom: 4mm !important;
+      color: var(--slide-body-color) !important;
     }
     .slide li {
-      font-size: 14pt !important;
+      font-size: 13pt !important;
       line-height: 1.6 !important;
+      color: var(--slide-body-color) !important;
+    }
+    .slide li strong {
+      color: var(--slide-header-color) !important;
     }
     .slide table {
-      font-size: 12pt !important;
+      font-size: 11pt !important;
       margin-top: 4mm !important;
     }
     .slide blockquote {
       padding: 4mm 6mm !important;
       margin: 4mm 0 !important;
+      background: var(--quote-bg) !important;
+      border-left: 5px solid var(--quote-border) !important;
     }
     .slide blockquote p {
-      font-size: 16pt !important;
+      font-size: 15pt !important;
+      color: var(--slide-header-color) !important;
     }
     .slide img {
-      max-height: 75mm !important; /* slightly smaller in print to guarantee margins */
+      max-height: 70mm !important; /* slightly smaller in print to guarantee margins */
       max-width: 90% !important;
       margin: 5mm auto !important;
       box-shadow: 0 4mm 10mm rgba(0,0,0,0.3) !important;
@@ -1773,13 +1781,24 @@ textarea:focus, button:focus {
       background: rgba(255, 255, 255, 0.04) !important;
       border: 1px solid var(--border-color) !important;
     }
-    &.theme-classic-ivory .agenda-item, &.theme-warm-minimalist .agenda-item {
-      background: rgba(15, 90, 71, 0.03) !important;
-      border: 1px solid rgba(15, 90, 71, 0.1) !important;
+    
+    /* Absolute Positioning for footer markers in A4 print */
+    .slide-brand-logo {
+      position: absolute !important;
+      bottom: 12mm !important;
+      left: 16mm !important;
+      font-size: 10pt !important;
+      opacity: 0.75 !important;
+      color: var(--accent) !important;
     }
-    &.theme-corporate-navy .agenda-item {
-      background: rgba(29, 78, 216, 0.03) !important;
-      border: 1px solid rgba(29, 78, 216, 0.08) !important;
+    
+    .slide-footer-marker {
+      position: absolute !important;
+      bottom: 12mm !important;
+      right: 16mm !important;
+      font-size: 10pt !important;
+      opacity: 0.75 !important;
+      color: var(--text-muted) !important;
     }
   }
 
@@ -1810,8 +1829,16 @@ textarea:focus, button:focus {
       align-items: center !important;
       padding: 35mm 30mm !important;
       margin: 0 !important;
+      background: var(--slide-card-bg) !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
+    }
+    
+    .document-mode .doc-cover-page h1 {
+      color: var(--slide-header-color) !important;
+      background: var(--accent-gradient) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
     }
     
     .document-mode .doc-section-page {
@@ -1826,8 +1853,44 @@ textarea:focus, button:focus {
       box-shadow: none !important;
       padding: 30mm 30mm 40mm 30mm !important;
       margin: 0 !important;
+      background: var(--slide-card-bg) !important;
+      color: var(--slide-body-color) !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
+    }
+    
+    /* Chapter Title Pages in document mode (H1 section headers) */
+    .document-mode .doc-section-page.chapter-page {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      text-align: center !important;
+      padding: 35mm 30mm !important;
+    }
+    
+    .document-mode .doc-section-page.chapter-page .rendered-markdown {
+      max-width: 85% !important;
+    }
+    
+    .document-mode .doc-section-page.chapter-page h1 {
+      font-size: 32pt !important;
+      text-align: center !important;
+      background: var(--accent-gradient) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      border-bottom: none !important;
+      padding-bottom: 0 !important;
+    }
+    
+    .document-mode .doc-section-page.chapter-page::after {
+      content: '' !important;
+      display: block !important;
+      width: 30mm !important;
+      height: 1mm !important;
+      background: var(--accent-gradient) !important;
+      margin-top: 6mm !important;
+      border-radius: 1px !important;
     }
     
     .document-mode .doc-section-page .rendered-markdown {
@@ -1846,21 +1909,23 @@ textarea:focus, button:focus {
       display: flex !important;
       justify-content: space-between !important;
       align-items: center !important;
+      color: var(--text-muted) !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
     
     .rendered-markdown {
-      color: inherit !important;
+      color: var(--slide-body-color) !important;
       background: transparent !important;
       font-size: 11pt !important;
       line-height: 1.6 !important;
     }
     
     .rendered-markdown h1 {
-      font-size: 26pt !important;
+      font-size: 24pt !important;
       margin-top: 0 !important;
       margin-bottom: 12pt !important;
+      color: var(--slide-header-color) !important;
       page-break-after: avoid !important;
       break-after: avoid !important;
       border-bottom: 3px solid var(--accent) !important;
@@ -1871,6 +1936,7 @@ textarea:focus, button:focus {
       font-size: 18pt !important;
       margin-top: 0 !important;
       margin-bottom: 10pt !important;
+      color: var(--slide-header-color) !important;
       page-break-after: avoid !important;
       break-after: avoid !important;
       border-bottom: 1px solid var(--border-color) !important;
@@ -1881,6 +1947,7 @@ textarea:focus, button:focus {
       font-size: 14pt !important;
       margin-top: 18pt !important;
       margin-bottom: 6pt !important;
+      color: var(--slide-header-color) !important;
       page-break-after: avoid !important;
       break-after: avoid !important;
     }
@@ -1888,10 +1955,15 @@ textarea:focus, button:focus {
     .rendered-markdown p {
       font-size: 11pt !important;
       margin-bottom: 10pt !important;
+      color: var(--slide-body-color) !important;
     }
     
     .rendered-markdown li {
       font-size: 11pt !important;
+      color: var(--slide-body-color) !important;
+    }
+    .rendered-markdown li strong {
+      color: var(--slide-header-color) !important;
     }
     
     .rendered-markdown tr {
@@ -1907,8 +1979,8 @@ textarea:focus, button:focus {
     }
     
     .rendered-markdown th {
-      background: rgba(99, 102, 241, 0.15) !important;
-      color: inherit !important;
+      background: rgba(99, 102, 241, 0.1) !important;
+      color: var(--slide-header-color) !important;
       border-bottom: 2px solid var(--border-color) !important;
       padding: 8pt 10pt !important;
     }
@@ -1916,7 +1988,7 @@ textarea:focus, button:focus {
     .rendered-markdown td {
       border-bottom: 1px solid var(--border-color) !important;
       padding: 8pt 10pt !important;
-      color: inherit !important;
+      color: var(--slide-body-color) !important;
     }
     
     .rendered-markdown blockquote {
@@ -1927,7 +1999,7 @@ textarea:focus, button:focus {
     }
     
     .rendered-markdown blockquote p {
-      color: inherit !important;
+      color: var(--slide-header-color) !important;
       font-size: 12pt !important;
       font-style: italic !important;
     }
@@ -1953,92 +2025,6 @@ textarea:focus, button:focus {
     }
     .toc-page {
       color: var(--accent) !important;
-    }
-    
-    /* Force specific background & header colors for print themes */
-    &.theme-midnight-tech .doc-cover-page,
-    &.theme-midnight-tech .doc-section-page {
-      background: #0f172a !important;
-      background: linear-gradient(135deg, #0b0f19 0%, #111827 50%, #1e1b4b 100%) !important;
-      color: #cbd5e1 !important;
-    }
-    &.theme-midnight-tech .doc-cover-page h1,
-    &.theme-midnight-tech .doc-section-page h1,
-    &.theme-midnight-tech .doc-section-page h2,
-    &.theme-midnight-tech .doc-section-page h3 {
-      color: #f8fafc !important;
-    }
-    
-    &.theme-classic-ivory .doc-cover-page,
-    &.theme-classic-ivory .doc-section-page {
-      background: #fcfbfa !important;
-      color: #292524 !important;
-    }
-    &.theme-classic-ivory .doc-cover-page h1,
-    &.theme-classic-ivory .doc-section-page h1,
-    &.theme-classic-ivory .doc-section-page h2,
-    &.theme-classic-ivory .doc-section-page h3 {
-      color: #0f5a47 !important;
-    }
-    
-    &.theme-nordic-aurora .doc-cover-page,
-    &.theme-nordic-aurora .doc-section-page {
-      background: linear-gradient(135deg, #011b15 0%, #022c22 100%) !important;
-      color: #ecfdf5 !important;
-    }
-    &.theme-nordic-aurora .doc-cover-page h1,
-    &.theme-nordic-aurora .doc-section-page h1,
-    &.theme-nordic-aurora .doc-section-page h2,
-    &.theme-nordic-aurora .doc-section-page h3 {
-      color: #34d399 !important;
-    }
-    
-    &.theme-vibrant-sunset .doc-cover-page,
-    &.theme-vibrant-sunset .doc-section-page {
-      background: linear-gradient(135deg, #18153f 0%, #44144b 100%) !important;
-      color: #f1f5f9 !important;
-    }
-    &.theme-vibrant-sunset .doc-cover-page h1,
-    &.theme-vibrant-sunset .doc-section-page h1,
-    &.theme-vibrant-sunset .doc-section-page h2,
-    &.theme-vibrant-sunset .doc-section-page h3 {
-      color: #ffffff !important;
-    }
-    
-    &.theme-corporate-navy .doc-cover-page,
-    &.theme-corporate-navy .doc-section-page {
-      background: #ffffff !important;
-      color: #334155 !important;
-    }
-    &.theme-corporate-navy .doc-cover-page h1,
-    &.theme-corporate-navy .doc-section-page h1,
-    &.theme-corporate-navy .doc-section-page h2,
-    &.theme-corporate-navy .doc-section-page h3 {
-      color: #0f172a !important;
-    }
-    
-    &.theme-emerald-executive .doc-cover-page,
-    &.theme-emerald-executive .doc-section-page {
-      background: linear-gradient(135deg, #022c22 0%, #011f19 100%) !important;
-      color: #ecfdf5 !important;
-    }
-    &.theme-emerald-executive .doc-cover-page h1,
-    &.theme-emerald-executive .doc-section-page h1,
-    &.theme-emerald-executive .doc-section-page h2,
-    &.theme-emerald-executive .doc-section-page h3 {
-      color: #fbbf24 !important;
-    }
-    
-    &.theme-warm-minimalist .doc-cover-page,
-    &.theme-warm-minimalist .doc-section-page {
-      background: #faf7f2 !important;
-      color: #404040 !important;
-    }
-    &.theme-warm-minimalist .doc-cover-page h1,
-    &.theme-warm-minimalist .doc-section-page h1,
-    &.theme-warm-minimalist .doc-section-page h2,
-    &.theme-warm-minimalist .doc-section-page h3 {
-      color: #78350f !important;
     }
   }
 }

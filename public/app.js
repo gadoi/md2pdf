@@ -394,17 +394,22 @@ function renderPreview() {
       });
     }
     
-    // 2. Segment document elements into pages divided by H2
+    // 2. Segment document elements into pages divided by H2, H1 (new files/chapters) or HR (explicit break)
     const children = Array.from(tempDiv.children);
     const pages = [];
     let currentPageList = [];
     
     children.forEach((child) => {
-      if (child.tagName === 'H2') {
+      if (child.tagName === 'H2' || child.tagName === 'H1') {
         if (currentPageList.length > 0) {
           pages.push(currentPageList);
         }
         currentPageList = [child];
+      } else if (child.tagName === 'HR') {
+        if (currentPageList.length > 0) {
+          pages.push(currentPageList);
+        }
+        currentPageList = []; // Discard the HR element itself to prevent empty lines
       } else {
         currentPageList.push(child);
       }
@@ -417,10 +422,16 @@ function renderPreview() {
     let tocPageHtml = '';
     if (isAutoTOCEnabled && pages.length > 0) {
       const sectionTitles = [];
-      pages.forEach((pageEls) => {
+      pages.forEach((pageEls, idx) => {
+        const h1 = pageEls.find(el => el.tagName === 'H1');
         const h2 = pageEls.find(el => el.tagName === 'H2');
-        if (h2) {
-          sectionTitles.push(h2.textContent);
+        const heading = h1 || h2;
+        if (heading) {
+          sectionTitles.push({
+            title: heading.textContent,
+            level: heading.tagName.toLowerCase(),
+            index: idx
+          });
         }
       });
       
@@ -430,13 +441,14 @@ function renderPreview() {
             <h3><i class="fa-solid fa-list-ol"></i> Mục lục tài liệu</h3>
             <ul class="toc-list">
       `;
-      sectionTitles.forEach((title, idx) => {
+      sectionTitles.forEach((sec) => {
         // TOC is Page 2, so first H2 page is Page 3
-        const targetPageNum = idx + 3;
+        const targetPageNum = sec.index + 3;
+        const itemClass = sec.level === 'h1' ? 'toc-item toc-item-h1' : 'toc-item toc-item-h2';
         tocPageHtml += `
-          <li class="toc-item toc-item-h2">
-            <a href="#section-${idx}" class="toc-link">
-              <span class="toc-title">${title}</span>
+          <li class="${itemClass}">
+            <a href="#section-${sec.index}" class="toc-link">
+              <span class="toc-title">${sec.title}</span>
               <span class="toc-dots"></span>
               <span class="toc-page">Trang ${targetPageNum}</span>
             </a>
@@ -458,18 +470,23 @@ function renderPreview() {
     let finalDocHtml = coverPageHtml + tocPageHtml;
     
     pages.forEach((pageEls, index) => {
-      // Inject index as H2 ID for anchors
+      // Find the main heading of the page to set an anchor ID
+      const h1 = pageEls.find(el => el.tagName === 'H1');
       const h2 = pageEls.find(el => el.tagName === 'H2');
-      if (h2) {
-        h2.id = `section-${index}`;
+      const heading = h1 || h2;
+      if (heading) {
+        heading.id = `section-${index}`;
       }
+      
+      const isChapterPage = h1 && pageEls[0] === h1;
+      const pageClass = isChapterPage ? 'doc-section-page chapter-page' : 'doc-section-page';
       
       const elementsHtml = pageEls.map(el => el.outerHTML).join('');
       // Calculate dynamic page number offset
       const pageNum = index + 2 + (isAutoTOCEnabled ? 1 : 0);
       
       finalDocHtml += `
-        <div class="doc-section-page">
+        <div class="${pageClass}">
           <div class="rendered-markdown">
             ${elementsHtml}
           </div>
