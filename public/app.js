@@ -306,7 +306,7 @@ function renderPreview() {
     slideMarkdowns.forEach((slideMd, index) => {
       const parsedHtml = marked.parse(slideMd);
       const processedHtml = processSlideListLayout(parsedHtml);
-      const isTitleSlide = index === 0 && !slideMd.startsWith('##');
+      const isTitleSlide = slideMd.trim().startsWith('# ') || (index === 0 && !slideMd.trim().startsWith('##'));
       const slideClass = isTitleSlide ? 'slide title-slide' : 'slide';
       
       // Calculate current slide page number (adds 1 to slide index if Auto TOC slide is injected at index 1)
@@ -481,12 +481,13 @@ function renderPreview() {
       `;
     });
     
-    interactivePreviewEl.innerHTML = `
+    const wrappedDocHtml = `
       <div class="document-mode">
         ${finalDocHtml}
       </div>
     `;
-    printViewportEl.innerHTML = finalDocHtml;
+    interactivePreviewEl.innerHTML = wrappedDocHtml;
+    printViewportEl.innerHTML = wrappedDocHtml;
     previewModeBadgeEl.textContent = `Sales Proposal (A4 Portrait)`;
   }
 }
