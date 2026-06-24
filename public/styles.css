@@ -12,6 +12,10 @@
   --border-radius-md: 12px;
   --border-radius-lg: 20px;
   --sidebar-width: 320px;
+  
+  /* Font size scale factors */
+  --slide-font-size: 16px;
+  --doc-font-size: 11pt;
 }
 
 /* Midnight Tech Theme (Dark Blue & Violet) */
@@ -883,6 +887,7 @@ textarea:focus, button:focus {
   box-shadow: var(--slide-shadow);
   border-radius: var(--border-radius-md);
   margin-bottom: 40px;
+  font-size: var(--doc-font-size, 11pt);
 }
 
 .document-mode .doc-cover-page h1 {
@@ -944,6 +949,7 @@ textarea:focus, button:focus {
   margin-bottom: 40px;
   page-break-after: always;
   break-after: page;
+  font-size: var(--doc-font-size, 11pt);
 }
 
 /* Chapter Title Pages (H1 section headers) */
@@ -1030,6 +1036,7 @@ textarea:focus, button:focus {
   overflow: hidden;
   color: var(--slide-body-color);
   transition: var(--transition-smooth);
+  font-size: var(--slide-font-size, 16px);
 }
 
 /* Bounding box for content inside slide */
@@ -1076,7 +1083,7 @@ textarea:focus, button:focus {
 }
 
 .slide.title-slide h1 {
-  font-size: 42px;
+  font-size: 2.5em;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1098,7 +1105,7 @@ textarea:focus, button:focus {
 /* Sub-headings */
 .rendered-markdown h2,
 .slide h2 {
-  font-size: 26px;
+  font-size: 1.625em;
   border-bottom: 2px solid var(--border-color);
   padding-bottom: 10px;
   letter-spacing: -0.5px;
@@ -1108,7 +1115,7 @@ textarea:focus, button:focus {
 
 .rendered-markdown h3,
 .slide h3 {
-  font-size: 20px;
+  font-size: 1.25em;
   margin: 20px 0 10px 0;
   color: var(--slide-header-color);
   font-weight: 700;
@@ -1116,7 +1123,7 @@ textarea:focus, button:focus {
 
 .rendered-markdown p,
 .slide p {
-  font-size: 16px;
+  font-size: 1em;
   margin-bottom: 16px;
   color: var(--slide-body-color);
   font-weight: 400;
@@ -1135,7 +1142,7 @@ textarea:focus, button:focus {
 .rendered-markdown blockquote p,
 .slide blockquote p {
   font-style: italic;
-  font-size: 17px;
+  font-size: 1.05em;
   color: var(--slide-header-color);
   margin-bottom: 0;
   line-height: 1.6;
@@ -1154,7 +1161,7 @@ textarea:focus, button:focus {
 
 .rendered-markdown li,
 .slide li {
-  font-size: 15px;
+  font-size: 0.95em;
   line-height: 1.5;
   color: var(--slide-body-color);
 }
@@ -1179,7 +1186,7 @@ textarea:focus, button:focus {
   width: 100%;
   border-collapse: collapse;
   margin: 20px 0;
-  font-size: 13.5px;
+  font-size: 0.85em;
   text-align: left;
   border-radius: var(--border-radius-sm);
   overflow: hidden;
@@ -1234,7 +1241,7 @@ textarea:focus, button:focus {
   background: rgba(0, 0, 0, 0.3);
   padding: 3px 6px;
   border-radius: 4px;
-  font-size: 85%;
+  font-size: 0.85em;
   color: var(--accent);
 }
 
@@ -1246,6 +1253,7 @@ textarea:focus, button:focus {
   overflow-x: auto;
   border: 1px solid var(--border-color);
   margin: 15px 0;
+  font-size: 0.85em;
 }
 
 .rendered-markdown pre code,
@@ -1476,8 +1484,9 @@ textarea:focus, button:focus {
   color: var(--text-muted);
   font-weight: 600;
   letter-spacing: 0.5px;
-  z-index: 2;
-  opacity: 0.7;
+  z-index: 10 !important;
+  opacity: 0.75;
+  white-space: nowrap !important;
 }
 
 .slide-brand-logo {
@@ -1490,8 +1499,9 @@ textarea:focus, button:focus {
   display: flex;
   align-items: center;
   gap: 5px;
-  z-index: 2;
-  opacity: 0.7;
+  z-index: 10 !important;
+  opacity: 0.75;
+  white-space: nowrap !important;
 }
 
 
@@ -2287,4 +2297,31 @@ textarea:focus, button:focus {
   background: #f8fafc;
   border-color: rgba(0, 0, 0, 0.08);
   color: #0f172a;
+}
+}
+
+/* 10. MEASURING MODE FOR AUTO-FIT CALCULATIONS */
+#print-viewport.measuring-mode {
+  display: block !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: 0 !important;
+  visibility: hidden !important;
+  height: auto !important;
+  width: 100% !important;
+}
+
+#print-viewport.measuring-mode .slide {
+  width: 297mm !important;
+  height: 210mm !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+#print-viewport.measuring-mode .doc-section-page {
+  width: 210mm !important;
+  height: 297mm !important;
+  box-sizing: border-box !important;
 }

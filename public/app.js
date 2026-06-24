@@ -23,6 +23,13 @@ const statusInfoEl = document.getElementById('editor-status-info');
 const chkCombineFilesEl = document.getElementById('chk-combine-files');
 const chkAutoTocEl = document.getElementById('chk-auto-toc');
 
+// Font Adjustment Elements
+const rngSlideFontSizeEl = document.getElementById('rng-slide-font-size');
+const rngDocFontSizeEl = document.getElementById('rng-doc-font-size');
+const lblSlideFontSizeEl = document.getElementById('lbl-slide-font-size');
+const lblDocFontSizeEl = document.getElementById('lbl-doc-font-size');
+const chkAutoFitFontEl = document.getElementById('chk-auto-fit-font');
+
 // Presenter Mode Elements (New)
 const btnPresentEl = document.getElementById('btn-present');
 
@@ -271,34 +278,48 @@ function renderPreview() {
     let slideMarkdowns = splitMarkdownIntoSlides(currentContent);
     let totalSlides = slideMarkdowns.length;
     
-    // Inject Agenda Slide (Auto TOC)
-    let agendaSlideHtml = '';
+    // Inject Agenda Slide(s) (Auto TOC with pagination to prevent overflow)
+    const agendaSlidesHtmlList = [];
+    let agendaSlidesCount = 0;
     if (isAutoTOCEnabled && totalSlides > 1) {
       const slideTitles = slideMarkdowns.map((slideMd, idx) => extractSlideTitle(slideMd, idx));
+      const itemsPerAgendaSlide = 10;
+      const totalAgendaSlides = Math.ceil(slideTitles.length / itemsPerAgendaSlide);
       
-      agendaSlideHtml += `
-        <div class="slide agenda-slide">
-          <span class="slide-brand-logo">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Markdown2PDF
-          </span>
-          <h2 class="agenda-title"><i class="fa-solid fa-list-ol"></i> Mục lục chương trình</h2>
-          <div class="agenda-grid">
-      `;
-      slideTitles.forEach((title, idx) => {
-        agendaSlideHtml += `
-          <div class="agenda-item">
-            <span class="agenda-number">${idx + 1}</span>
-            <span>${title}</span>
+      for (let i = 0; i < totalAgendaSlides; i++) {
+        const startIdx = i * itemsPerAgendaSlide;
+        const pageTitlesChunk = slideTitles.slice(startIdx, startIdx + itemsPerAgendaSlide);
+        const titleSuffix = totalAgendaSlides > 1 ? ` (${i + 1}/${totalAgendaSlides})` : '';
+        
+        let agendaHtml = `
+          <div class="slide agenda-slide">
+            <span class="slide-brand-logo">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Markdown2PDF
+            </span>
+            <h2 class="agenda-title"><i class="fa-solid fa-list-ol"></i> Mục lục chương trình${titleSuffix}</h2>
+            <div class="agenda-grid">
+        `;
+        
+        pageTitlesChunk.forEach((title, chunkIdx) => {
+          const absoluteIdx = startIdx + chunkIdx + 1;
+          agendaHtml += `
+            <div class="agenda-item">
+              <span class="agenda-number">${absoluteIdx}</span>
+              <span>${title}</span>
+            </div>
+          `;
+        });
+        
+        agendaHtml += `
+            </div>
+            <span class="slide-footer-marker">Mục lục</span>
           </div>
         `;
-      });
-      agendaSlideHtml += `
-          </div>
-          <span class="slide-footer-marker">Mục lục</span>
-        </div>
-      `;
-      
-      totalSlides += 1;
+        
+        agendaSlidesHtmlList.push(agendaHtml);
+      }
+      agendaSlidesCount = agendaSlidesHtmlList.length;
+      totalSlides += agendaSlidesCount;
     }
     
     let htmlContent = '<div class="slides-container">';
@@ -309,8 +330,8 @@ function renderPreview() {
       const isTitleSlide = slideMd.trim().startsWith('# ') || (index === 0 && !slideMd.trim().startsWith('##'));
       const slideClass = isTitleSlide ? 'slide title-slide' : 'slide';
       
-      // Calculate current slide page number (adds 1 to slide index if Auto TOC slide is injected at index 1)
-      const displayPageNum = index + 1 + (isAutoTOCEnabled && index > 0 ? 1 : 0);
+      // Calculate current slide page number
+      const displayPageNum = index === 0 ? 1 : index + 1 + agendaSlidesCount;
       
       htmlContent += `
         <div class="${slideClass}">
@@ -326,7 +347,9 @@ function renderPreview() {
       
       // Inject Agenda Slide as Slide 2 (index 1)
       if (isAutoTOCEnabled && index === 0) {
-        htmlContent += agendaSlideHtml;
+        agendaSlidesHtmlList.forEach(agendaHtml => {
+          htmlContent += agendaHtml;
+        });
       }
     });
     
@@ -418,8 +441,9 @@ function renderPreview() {
       pages.push(currentPageList);
     }
     
-    // 3. Table of Contents (TOC) page calculation
+    // 3. Table of Contents (TOC) page calculation (paginated to prevent overflow)
     let tocPageHtml = '';
+    let tocPagesCount = 0;
     if (isAutoTOCEnabled && pages.length > 0) {
       const sectionTitles = [];
       pages.forEach((pageEls, idx) => {
@@ -435,35 +459,47 @@ function renderPreview() {
         }
       });
       
-      tocPageHtml += `
-        <div class="doc-section-page">
-          <div class="table-of-contents">
-            <h3><i class="fa-solid fa-list-ol"></i> Mục lục tài liệu</h3>
-            <ul class="toc-list">
-      `;
-      sectionTitles.forEach((sec) => {
-        // TOC is Page 2, so first H2 page is Page 3
-        const targetPageNum = sec.index + 3;
-        const itemClass = sec.level === 'h1' ? 'toc-item toc-item-h1' : 'toc-item toc-item-h2';
+      const itemsPerTocPage = 18;
+      const totalTocPages = Math.ceil(sectionTitles.length / itemsPerTocPage);
+      tocPagesCount = totalTocPages;
+      
+      for (let i = 0; i < totalTocPages; i++) {
+        const startIdx = i * itemsPerTocPage;
+        const chunk = sectionTitles.slice(startIdx, startIdx + itemsPerTocPage);
+        const titleSuffix = totalTocPages > 1 ? ` (${i + 1}/${totalTocPages})` : '';
+        const currentPageNum = i + 2; // TOC starts at Page 2
+        
         tocPageHtml += `
-          <li class="${itemClass}">
-            <a href="#section-${sec.index}" class="toc-link">
-              <span class="toc-title">${sec.title}</span>
-              <span class="toc-dots"></span>
-              <span class="toc-page">Trang ${targetPageNum}</span>
-            </a>
-          </li>
+          <div class="doc-section-page">
+            <div class="table-of-contents">
+              <h3><i class="fa-solid fa-list-ol"></i> Mục lục tài liệu${titleSuffix}</h3>
+              <ul class="toc-list">
         `;
-      });
-      tocPageHtml += `
-            </ul>
+        
+        chunk.forEach((sec) => {
+          const targetPageNum = 1 + totalTocPages + sec.index;
+          const itemClass = sec.level === 'h1' ? 'toc-item toc-item-h1' : 'toc-item toc-item-h2';
+          tocPageHtml += `
+            <li class="${itemClass}">
+              <a href="#section-${sec.index}" class="toc-link">
+                <span class="toc-title">${sec.title}</span>
+                <span class="toc-dots"></span>
+                <span class="toc-page">Trang ${targetPageNum}</span>
+              </a>
+            </li>
+          `;
+        });
+        
+        tocPageHtml += `
+              </ul>
+            </div>
+            <div class="doc-page-footer">
+              <span></span>
+              <span>Trang ${currentPageNum}</span>
+            </div>
           </div>
-          <div class="doc-page-footer">
-            <span></span>
-            <span>Trang 2</span>
-          </div>
-        </div>
-      `;
+        `;
+      }
     }
     
     // 4. Assemble the pages with headers & footers
@@ -483,7 +519,7 @@ function renderPreview() {
       
       const elementsHtml = pageEls.map(el => el.outerHTML).join('');
       // Calculate dynamic page number offset
-      const pageNum = index + 2 + (isAutoTOCEnabled ? 1 : 0);
+      const pageNum = index + 2 + tocPagesCount;
       
       finalDocHtml += `
         <div class="${pageClass}">
@@ -507,6 +543,9 @@ function renderPreview() {
     printViewportEl.innerHTML = wrappedDocHtml;
     previewModeBadgeEl.textContent = `Sales Proposal (A4 Portrait)`;
   }
+  
+  // Auto-fit font sizes dynamically to prevent content overflow on both preview & print
+  autoFitSlideFonts();
 }
 
 // Load and combine all Markdown files in the directory
@@ -891,7 +930,28 @@ function setupEventListeners() {
   
   // Export PDF Button
   btnExportPdfEl.addEventListener('click', () => {
+    // Run auto-fit calculations once more on print container before calling browser print
+    autoFitSlideFonts();
     window.print();
+  });
+
+  // Font size sliders
+  rngSlideFontSizeEl.addEventListener('input', (e) => {
+    const val = e.target.value;
+    lblSlideFontSizeEl.textContent = `${val}px`;
+    document.body.style.setProperty('--slide-font-size', `${val}px`);
+    autoFitSlideFonts();
+  });
+
+  rngDocFontSizeEl.addEventListener('input', (e) => {
+    const val = e.target.value;
+    lblDocFontSizeEl.textContent = `${val}pt`;
+    document.body.style.setProperty('--doc-font-size', `${val}pt`);
+    autoFitSlideFonts();
+  });
+
+  chkAutoFitFontEl.addEventListener('change', () => {
+    autoFitSlideFonts();
   });
   
   // Initially disable elements before file selection
@@ -1208,6 +1268,101 @@ function resetPdfEditorState() {
   document.getElementById('pdf-file-input').value = '';
   document.getElementById('pdf-merge-input').value = '';
   clearSignatureCanvas();
+}
+
+// Auto-fit Font Sizes to prevent page overflows
+function autoFitSlideFonts() {
+  const isAutoFitEnabled = chkAutoFitFontEl.checked;
+  
+  // 1. Process preview container
+  const previewSlides = interactivePreviewEl.querySelectorAll('.slide');
+  previewSlides.forEach(slide => {
+    slide.style.fontSize = ''; // reset to default CSS value
+    if (!isAutoFitEnabled) return;
+    
+    const clientHeight = slide.clientHeight;
+    let scrollHeight = slide.scrollHeight;
+    
+    if (clientHeight > 0 && scrollHeight > clientHeight) {
+      let currentScale = 1.0;
+      const minScale = 0.65; // don't shrink more than 65%
+      const baseFontSize = parseFloat(window.getComputedStyle(slide).fontSize) || 16;
+      
+      while (scrollHeight > slide.clientHeight && currentScale > minScale) {
+        currentScale -= 0.02;
+        slide.style.fontSize = `${baseFontSize * currentScale}px`;
+        scrollHeight = slide.scrollHeight;
+      }
+    }
+  });
+
+  const previewPages = interactivePreviewEl.querySelectorAll('.doc-section-page');
+  previewPages.forEach(page => {
+    page.style.fontSize = ''; // reset
+    if (!isAutoFitEnabled) return;
+    
+    const clientHeight = page.clientHeight;
+    let scrollHeight = page.scrollHeight;
+    
+    if (clientHeight > 0 && scrollHeight > clientHeight) {
+      let currentScale = 1.0;
+      const minScale = 0.7;
+      const baseFontSize = parseFloat(window.getComputedStyle(page).fontSize) || 15;
+      
+      while (scrollHeight > page.clientHeight && currentScale > minScale) {
+        currentScale -= 0.02;
+        page.style.fontSize = `${baseFontSize * currentScale}px`;
+        scrollHeight = page.scrollHeight;
+      }
+    }
+  });
+
+  // 2. Process print container using measuring mode
+  printViewportEl.classList.add('measuring-mode');
+  
+  const printSlides = printViewportEl.querySelectorAll('.slide');
+  printSlides.forEach(slide => {
+    slide.style.fontSize = '';
+    if (!isAutoFitEnabled) return;
+    
+    const clientHeight = slide.clientHeight || 793; // 210mm at 96dpi
+    let scrollHeight = slide.scrollHeight;
+    
+    if (scrollHeight > clientHeight) {
+      let currentScale = 1.0;
+      const minScale = 0.65;
+      const baseFontSize = parseFloat(window.getComputedStyle(slide).fontSize) || 16;
+      
+      while (scrollHeight > clientHeight && currentScale > minScale) {
+        currentScale -= 0.02;
+        slide.style.fontSize = `${baseFontSize * currentScale}px`;
+        scrollHeight = slide.scrollHeight;
+      }
+    }
+  });
+
+  const printPages = printViewportEl.querySelectorAll('.doc-section-page');
+  printPages.forEach(page => {
+    page.style.fontSize = '';
+    if (!isAutoFitEnabled) return;
+    
+    const clientHeight = page.clientHeight || 1122; // 297mm at 96dpi
+    let scrollHeight = page.scrollHeight;
+    
+    if (scrollHeight > clientHeight) {
+      let currentScale = 1.0;
+      const minScale = 0.7;
+      const baseFontSize = parseFloat(window.getComputedStyle(page).fontSize) || 15;
+      
+      while (scrollHeight > clientHeight && currentScale > minScale) {
+        currentScale -= 0.02;
+        page.style.fontSize = `${baseFontSize * currentScale}px`;
+        scrollHeight = page.scrollHeight;
+      }
+    }
+  });
+  
+  printViewportEl.classList.remove('measuring-mode');
 }
 
 // Start application
