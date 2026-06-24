@@ -1498,14 +1498,14 @@ textarea:focus, button:focus {
   box-shadow: none !important;
   display: none !important;
   animation: slideTransitionFade 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 8% 12% !important; /* Spacious margins on all sides to prevent text close to border */
+  padding: 10% 14% !important; /* Spacious margins on all sides to prevent text close to border */
   justify-content: center !important;
   box-sizing: border-box !important;
 }
 
 /* Width bounding box in fullscreen */
 .preview-wrapper:fullscreen .slide .rendered-markdown {
-  max-width: 90% !important;
+  max-width: 85% !important;
   margin: 0 auto !important;
   width: 100% !important;
 }
@@ -1519,45 +1519,45 @@ textarea:focus, button:focus {
   to { opacity: 1; transform: scale(1); }
 }
 
-/* Fullscreen sizing overrides */
+/* Fullscreen sizing overrides (optimized for breathing room) */
 .preview-wrapper:fullscreen .slide h1 {
-  font-size: 5.5vw !important;
+  font-size: 4vw !important;
   margin-bottom: 3vh !important;
 }
 .preview-wrapper:fullscreen .slide h2 {
-  font-size: 3.2vw !important; /* slightly smaller to fit nicely within larger padding */
+  font-size: 2.4vw !important; /* slightly smaller to fit nicely within larger padding */
   margin-bottom: 2vh !important;
 }
 .preview-wrapper:fullscreen .slide h3 {
-  font-size: 2.2vw !important;
+  font-size: 1.8vw !important;
 }
 .preview-wrapper:fullscreen .slide p {
-  font-size: 1.6vw !important;
+  font-size: 1.2vw !important;
   margin-bottom: 2vh !important;
 }
 .preview-wrapper:fullscreen .slide li {
-  font-size: 1.6vw !important;
-}
-.preview-wrapper:fullscreen .slide table {
   font-size: 1.2vw !important;
 }
+.preview-wrapper:fullscreen .slide table {
+  font-size: 1vw !important;
+}
 .preview-wrapper:fullscreen .slide blockquote p {
-  font-size: 2vw !important;
+  font-size: 1.5vw !important;
 }
 .preview-wrapper:fullscreen .slide img {
-  max-height: 40vh !important; /* smaller image height to give page breath */
+  max-height: 30vh !important; /* smaller image height to give page breath */
   margin: 3vh auto !important;
 }
 .preview-wrapper:fullscreen .slide .slide-brand-logo,
 .preview-wrapper:fullscreen .slide .slide-footer-marker {
-  font-size: 1vw !important;
-  bottom: 5vh !important; /* moved slightly higher to clear margins */
+  font-size: 0.8vw !important;
+  bottom: 4vh !important; /* moved slightly higher to clear margins */
 }
 .preview-wrapper:fullscreen .slide .slide-brand-logo {
-  left: 8vw !important;
+  left: 10vw !important;
 }
 .preview-wrapper:fullscreen .slide .slide-footer-marker {
-  right: 8vw !important;
+  right: 10vw !important;
 }
 
 
