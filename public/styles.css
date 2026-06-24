@@ -867,17 +867,19 @@ textarea:focus, button:focus {
   box-shadow: none;
   padding: 0;
   color: inherit;
+  font-size: inherit; /* Inherit var(--doc-font-size) from page container */
   min-height: auto;
 }
 
 /* Document Cover Sheet Layout */
 .document-mode .doc-cover-page {
-  min-height: 297mm; /* standard A4 height */
+  width: 210mm;
+  height: 297mm; /* standard A4 height */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 60px 80px;
+  padding: 35mm 30mm; /* Match print padding exactly */
   position: relative;
   border-bottom: 2px solid var(--border-color);
   page-break-after: always;
@@ -886,8 +888,9 @@ textarea:focus, button:focus {
   background: var(--slide-card-bg);
   box-shadow: var(--slide-shadow);
   border-radius: var(--border-radius-md);
-  margin-bottom: 40px;
+  margin: 0 auto 40px auto;
   font-size: var(--doc-font-size, 11pt);
+  overflow: hidden;
 }
 
 .document-mode .doc-cover-page h1 {
@@ -922,6 +925,8 @@ textarea:focus, button:focus {
 .document-mode .doc-cover-meta {
   position: absolute;
   bottom: 50px;
+  left: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -942,14 +947,16 @@ textarea:focus, button:focus {
   border: 1px solid var(--slide-card-border);
   box-shadow: var(--slide-shadow);
   border-radius: var(--border-radius-md);
-  padding: 60px 80px 100px 80px; /* luxurious breathing space margins */
+  padding: 30mm 30mm 40mm 30mm; /* Match print padding exactly for luxury breathing space */
   color: var(--slide-body-color);
-  min-height: 297mm; /* A4 size aspect scale */
+  width: 210mm;
+  height: 297mm; /* A4 size aspect scale */
   box-sizing: border-box;
-  margin-bottom: 40px;
+  margin: 0 auto 40px auto;
   page-break-after: always;
   break-after: page;
   font-size: var(--doc-font-size, 11pt);
+  overflow: hidden;
 }
 
 /* Chapter Title Pages (H1 section headers) */
@@ -1423,41 +1430,44 @@ textarea:focus, button:focus {
   width: 100%;
 }
 
-.agenda-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 30px;
-  row-gap: 16px;
+.agenda-list {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   width: 100%;
-  margin-top: 10px;
+  max-width: 80%;
+  margin: 10px auto 0 auto !important;
 }
 
-.agenda-item {
+.agenda-list-item {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border-color);
-  padding: 14px 20px;
+  padding: 10px 20px;
   border-radius: var(--border-radius-md);
-  font-size: 14.5px;
+  font-size: 1.1em;
   font-weight: 600;
   color: var(--slide-body-color);
   transition: var(--transition-smooth);
 }
 
-.theme-classic-ivory .agenda-item,
-.theme-warm-minimalist .agenda-item {
+.theme-classic-ivory .agenda-list-item,
+.theme-warm-minimalist .agenda-list-item {
   background: rgba(15, 90, 71, 0.03);
 }
-.theme-corporate-navy .agenda-item {
+.theme-corporate-navy .agenda-list-item {
   background: rgba(29, 78, 216, 0.03);
 }
 
-.agenda-item:hover {
+.agenda-list-item:hover {
   border-color: var(--accent);
   background: rgba(99, 102, 241, 0.05);
-  transform: translateY(-2px);
+  transform: translateX(5px);
 }
 
 .agenda-number {
@@ -1787,7 +1797,7 @@ textarea:focus, button:focus {
       box-shadow: 0 4mm 10mm rgba(0,0,0,0.3) !important;
     }
     
-    .agenda-item {
+    .agenda-list-item {
       background: rgba(255, 255, 255, 0.04) !important;
       border: 1px solid var(--border-color) !important;
     }
@@ -1927,7 +1937,7 @@ textarea:focus, button:focus {
     .rendered-markdown {
       color: var(--slide-body-color) !important;
       background: transparent !important;
-      font-size: 11pt !important;
+      font-size: inherit !important;
       line-height: 1.6 !important;
     }
     
@@ -2324,4 +2334,25 @@ textarea:focus, button:focus {
   width: 210mm !important;
   height: 297mm !important;
   box-sizing: border-box !important;
+}
+}
+
+/* 11. RAW HTML ALIGNMENT & DECORATION SUPPORT FOR OFFICE EDITING */
+.rendered-markdown div[align="left"], .rendered-markdown p[align="left"], .rendered-markdown span[align="left"] { 
+  text-align: left !important; 
+}
+.rendered-markdown div[align="center"], .rendered-markdown p[align="center"], .rendered-markdown span[align="center"] { 
+  text-align: center !important; 
+}
+.rendered-markdown div[align="right"], .rendered-markdown p[align="right"], .rendered-markdown span[align="right"] { 
+  text-align: right !important; 
+}
+.rendered-markdown div[align="justify"], .rendered-markdown p[align="justify"], .rendered-markdown span[align="justify"] { 
+  text-align: justify !important; 
+}
+
+/* Ensure inline styles are respected */
+.rendered-markdown span[style*="color"], .rendered-markdown font[color] {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }

@@ -297,21 +297,21 @@ function renderPreview() {
               <i class="fa-solid fa-wand-magic-sparkles"></i> Markdown2PDF
             </span>
             <h2 class="agenda-title"><i class="fa-solid fa-list-ol"></i> Mục lục chương trình${titleSuffix}</h2>
-            <div class="agenda-grid">
+            <ul class="agenda-list">
         `;
         
         pageTitlesChunk.forEach((title, chunkIdx) => {
           const absoluteIdx = startIdx + chunkIdx + 1;
           agendaHtml += `
-            <div class="agenda-item">
+            <li class="agenda-list-item">
               <span class="agenda-number">${absoluteIdx}</span>
               <span>${title}</span>
-            </div>
+            </li>
           `;
         });
         
         agendaHtml += `
-            </div>
+            </ul>
             <span class="slide-footer-marker">Mục lục</span>
           </div>
         `;
@@ -417,29 +417,83 @@ function renderPreview() {
       });
     }
     
-    // 2. Segment document elements into pages divided by H2, H1 (new files/chapters) or HR (explicit break)
+    // 2. Segment document elements dynamically using an A4 off-screen measuring container
     const children = Array.from(tempDiv.children);
     const pages = [];
-    let currentPageList = [];
+    let currentPageElements = [];
     
+    // Create temporary measuring container in DOM
+    const measureContainer = document.createElement('div');
+    measureContainer.className = 'document-mode theme-' + currentTheme;
+    measureContainer.style.position = 'absolute';
+    measureContainer.style.left = '-9999px';
+    measureContainer.style.top = '0';
+    measureContainer.style.width = '210mm';
+    measureContainer.style.height = 'auto';
+    measureContainer.style.boxSizing = 'border-box';
+    document.body.appendChild(measureContainer);
+
+    let testPage = document.createElement('div');
+    testPage.className = 'doc-section-page';
+    testPage.style.width = '210mm';
+    testPage.style.height = '297mm'; // Fixed height to measure scroll overflow
+    testPage.style.boxSizing = 'border-box';
+    testPage.style.padding = '30mm 30mm 40mm 30mm';
+    testPage.style.overflow = 'hidden';
+    
+    let testMarkdownContainer = document.createElement('div');
+    testMarkdownContainer.className = 'rendered-markdown';
+    testPage.appendChild(testMarkdownContainer);
+    measureContainer.appendChild(testPage);
+
     children.forEach((child) => {
-      if (child.tagName === 'H2' || child.tagName === 'H1') {
-        if (currentPageList.length > 0) {
-          pages.push(currentPageList);
+      // 1. HR (---) denotes active manual page break
+      if (child.tagName === 'HR') {
+        if (currentPageElements.length > 0) {
+          pages.push(currentPageElements);
+          currentPageElements = [];
+          testMarkdownContainer.innerHTML = '';
         }
-        currentPageList = [child];
-      } else if (child.tagName === 'HR') {
-        if (currentPageList.length > 0) {
-          pages.push(currentPageList);
+        return; // discard HR element
+      }
+      
+      // 2. H1 denotes chapter section page break
+      if (child.tagName === 'H1') {
+        if (currentPageElements.length > 0) {
+          pages.push(currentPageElements);
+          currentPageElements = [];
+          testMarkdownContainer.innerHTML = '';
         }
-        currentPageList = []; // Discard the HR element itself to prevent empty lines
+        currentPageElements.push(child);
+        pages.push(currentPageElements);
+        currentPageElements = [];
+        return;
+      }
+      
+      // 3. Normal elements (H2, H3, P, Table, List) segment dynamically based on physical height overflow
+      const clone = child.cloneNode(true);
+      testMarkdownContainer.appendChild(clone);
+      
+      const pageHeight = testPage.offsetHeight || 1122; // standard A4 height in pixels
+      const contentHeight = testPage.scrollHeight;
+      
+      if (contentHeight > pageHeight && currentPageElements.length > 0) {
+        // Page limit reached! Flush current page elements and start new page
+        pages.push(currentPageElements);
+        currentPageElements = [child];
+        testMarkdownContainer.innerHTML = '';
+        testMarkdownContainer.appendChild(clone);
       } else {
-        currentPageList.push(child);
+        currentPageElements.push(child);
       }
     });
-    if (currentPageList.length > 0) {
-      pages.push(currentPageList);
+    
+    if (currentPageElements.length > 0) {
+      pages.push(currentPageElements);
     }
+    
+    // Clean up measuring elements
+    document.body.removeChild(measureContainer);
     
     // 3. Table of Contents (TOC) page calculation (paginated to prevent overflow)
     let tocPageHtml = '';
@@ -484,7 +538,7 @@ function renderPreview() {
               <a href="#section-${sec.index}" class="toc-link">
                 <span class="toc-title">${sec.title}</span>
                 <span class="toc-dots"></span>
-                <span class="toc-page">Trang ${targetPageNum}</span>
+                <span class="toc-page">${targetPageNum}</span>
               </a>
             </li>
           `;
@@ -680,6 +734,18 @@ function setupToolbarListeners() {
         case 'italic':
           insertTextAtCursor('*', '*');
           break;
+        case 'align-left':
+          insertTextAtCursor('<div align="left">\n', '\n</div>');
+          break;
+        case 'align-center':
+          insertTextAtCursor('<div align="center">\n', '\n</div>');
+          break;
+        case 'align-right':
+          insertTextAtCursor('<div align="right">\n', '\n</div>');
+          break;
+        case 'align-justify':
+          insertTextAtCursor('<div align="justify">\n', '\n</div>');
+          break;
         case 'quote':
           insertTextAtCursor('> ', '');
           break;
@@ -705,6 +771,21 @@ function setupToolbarListeners() {
       }
     });
   });
+  
+  const tbBtnColor = document.getElementById('tb-btn-color');
+  const tbColorPicker = document.getElementById('tb-color-picker');
+  if (tbBtnColor && tbColorPicker) {
+    tbBtnColor.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (markdownEditorEl.disabled) return;
+      tbColorPicker.click();
+    });
+    
+    tbColorPicker.addEventListener('change', (e) => {
+      const color = e.target.value;
+      insertTextAtCursor(`<span style="color: ${color}">`, '</span>');
+    });
+  }
   
   imageUploadInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
