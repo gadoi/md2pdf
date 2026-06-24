@@ -7,10 +7,12 @@ Chúng tôi đã hoàn thành các cập nhật tối ưu hóa toàn diện cho 
 ## Chi tiết các tính năng mới đã triển khai
 
 ### 1. Thanh công cụ Editor nâng cấp (Office-like Formatting Toolbar)
-*   **Vị trí**: Đã thêm các nút căn lề và chọn màu sắc trực quan tại thanh công cụ phía trên khung soạn thảo Markdown.
+*   **Vị trí**: Đã thêm các nút căn lề, chọn cỡ chữ và màu sắc trực quan tại thanh công cụ phía trên khung soạn thảo Markdown.
 *   **Chức năng**:
     *   **Nút căn lề (Căn trái, Căn giữa, Căn phải, Căn đều)**: Tự động chèn các cặp thẻ HTML `<div align="left|center|right|justify">...</div>` bao quanh phần văn bản đang chọn.
     *   **Nút chọn màu chữ**: Tích hợp picker màu sắc trực quan để chèn thẻ `<span style="color: #hex">...</span>`, cho phép định dạng màu sắc linh hoạt.
+    *   **Lựa chọn cỡ chữ (Dropdown Select)**: Cho phép chèn thẻ `<span style="font-size: 0.85em|1.2em|1.5em|2em|2.5em">...</span>` để người dùng dễ dàng tùy chỉnh cỡ chữ cho các đoạn văn bản hay đề mục riêng biệt.
+    *   **Chèn dòng Mục lục thủ công**: Nút chèn nhanh mẫu thẻ HTML liên kết mục lục `<a href="#anchor-id" class="toc-link"><span class="toc-title">Tiêu đề</span><span class="toc-dots"></span><span class="toc-page">Trang số</span></a>` để người dùng tự do thiết lập danh sách mục lục (TOC) thủ công theo phong cách chuyên nghiệp riêng.
     *   **Cơ chế Render**: Các thẻ HTML định dạng này được hỗ trợ render mượt mà trong chế độ Slide và Tài liệu nhờ vào các class tùy biến chuyên biệt trong `styles.css`.
 
 ### 2. Xem trước khớp 100% với file PDF in ra (WYSWIG PDF Mirroring)
