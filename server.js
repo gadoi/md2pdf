@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve the Rardar files directory as a static folder so the frontend can load images
+// Serve the files directory as a static folder so the frontend can load images
 app.use('/radar-files', express.static(RARDAR_DIR));
 
 // Ensure directories exist
@@ -43,7 +43,6 @@ const storage = multer.diskStorage({
     cb(null, UPLOADS_DIR);
   },
   filename: function (req, file, cb) {
-    // Generate unique name keeping the original extension
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const ext = path.extname(file.originalname);
     cb(null, 'img-' + uniqueSuffix + ext);
@@ -54,7 +53,6 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // Limit to 10MB
   fileFilter: function (req, file, cb) {
-    // Validate image types
     const filetypes = /jpeg|jpg|png|gif|webp/;
     const mimetype = filetypes.test(file.mimetype);
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -81,7 +79,6 @@ app.post('/api/upload', (req, res) => {
       return res.status(400).json({ error: 'Không nhận được tệp tin ảnh nào' });
     }
     
-    // Return relative URL that points to the static route
     const imageUrl = `/radar-files/images/${req.file.filename}`;
     res.json({ 
       success: true, 
@@ -157,7 +154,10 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Watching markdown files in: ${RARDAR_DIR}`);
-  console.log(`Uploads will be saved to: ${UPLOADS_DIR}`);
+  console.log(`===================================================`);
+  console.log(`   Markdown2PDF Kit Server is running!`);
+  console.log(`   URL: http://localhost:${PORT}`);
+  console.log(`   Markdown folder: ${RARDAR_DIR}`);
+  console.log(`   Uploads folder: ${UPLOADS_DIR}`);
+  console.log(`===================================================`);
 });

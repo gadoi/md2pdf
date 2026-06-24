@@ -1,7 +1,7 @@
 @echo off
-title Radar PDF Kit Startup Script
+title Markdown2PDF Kit Startup Script
 echo ===================================================================
-echo             KHOI DONG RADAR PDF KIT — SALES KIT GENERATOR
+echo             KHOI DONG MARKDOWN2PDF KIT — SALES KIT GENERATOR
 echo ===================================================================
 echo.
 
@@ -36,7 +36,7 @@ echo [OK] Dang khoi dong server tren cong 3000...
 echo [OK] Tu dong mo trinh duyet den: http://localhost:3000
 echo.
 
-:: Wait 1 second and open browser
+:: Wait 2 seconds and open browser
 timeout /t 2 /nobreak >nul
 start http://localhost:3000
 

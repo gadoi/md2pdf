@@ -1,4 +1,4 @@
-# Radar PDF Kit
+# Markdown2PDF Kit
 
 Công cụ chuyên nghiệp giúp chuyển đổi các tệp Markdown (.md) thành tài liệu thuyết trình (Slide Deck) hoặc tài liệu bán hàng (Sales Proposal) PDF với giao diện thiết kế hiện đại, cao cấp.
 
@@ -25,7 +25,7 @@ Dự án yêu cầu cài đặt **Node.js** (Phiên bản v18 trở lên). Bạn
 ## Cấu trúc thư mục dự án
 
 ```
-radar-pdf-kit/
+markdown2pdf-kit/
 ├── public/                 # Mã nguồn Frontend (HTML, CSS, JS)
 │   ├── index.html
 │   ├── styles.css
@@ -33,6 +33,7 @@ radar-pdf-kit/
 ├── server.js               # Mã nguồn Backend Node.js Express
 ├── package.json            # Cấu hình dependency dự án
 ├── run.bat                 # File script chạy tự động trên Windows
+├── run.sh                  # File script chạy tự động trên Linux / macOS
 └── README.md               # Tài liệu hướng dẫn
 ```
 
@@ -43,13 +44,25 @@ Hình ảnh tải lên sẽ được lưu trữ tại: `C:\Users\gd\Downloads\Ra
 
 ## Hướng dẫn cài đặt & Chạy trên máy tính khác
 
-### Cách nhanh nhất (Dành cho Windows)
+### Dành cho Windows
 1. Hãy chắc chắn máy tính mới đã cài đặt **Node.js**.
-2. Giải nén thư mục `radar-pdf-kit` trên máy tính mới.
+2. Giải nén thư mục dự án.
 3. Kích đúp (Double-click) vào tệp **`run.bat`** ở thư mục gốc của dự án.
    - Script sẽ tự động kiểm tra môi trường, cài đặt thư viện (`npm install` nếu chạy lần đầu), khởi động máy chủ và tự động mở trình duyệt web tại địa chỉ `http://localhost:3000`.
 
-### Cách thủ công (Dành cho macOS / Linux / Windows)
+### Dành cho Linux / macOS
+1. Hãy chắc chắn máy tính mới đã cài đặt **Node.js**.
+2. Mở Terminal tại thư mục dự án.
+3. Cấp quyền thực thi cho file shell (chỉ cần chạy lần đầu):
+   ```bash
+   chmod +x run.sh
+   ```
+4. Chạy script:
+   ```bash
+   ./run.sh
+   ```
+
+### Cách chạy thủ công
 1. Mở Terminal / Command Prompt tại thư mục dự án.
 2. Cài đặt các thư viện phụ thuộc:
    ```bash

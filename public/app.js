@@ -268,7 +268,7 @@ function renderPreview() {
       agendaSlideHtml += `
         <div class="slide agenda-slide">
           <span class="slide-brand-logo">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Software Radar
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Markdown2PDF
           </span>
           <h2 class="agenda-title"><i class="fa-solid fa-list-ol"></i> Mục lục chương trình</h2>
           <div class="agenda-grid">
@@ -304,7 +304,7 @@ function renderPreview() {
       htmlContent += `
         <div class="${slideClass}">
           <span class="slide-brand-logo">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Software Radar
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Markdown2PDF
           </span>
           <div class="rendered-markdown">
             ${processedHtml}
@@ -359,7 +359,7 @@ function renderPreview() {
           <h1>${title}</h1>
           <div class="doc-cover-subtitle">Tài liệu giới thiệu giải pháp & Sales Kit</div>
           <div class="doc-cover-meta">
-            ${metaStrings.join('') || '<span>Đơn vị phát hành: <strong>Software Radar</strong></span>'}
+            ${metaStrings.join('') || '<span>Đơn vị phát hành: <strong>Markdown2PDF Kit</strong></span>'}
             <span>Ngày xuất bản: <strong>${new Date().toLocaleDateString('vi-VN')}</strong></span>
           </div>
         </div>
@@ -436,7 +436,7 @@ function renderPreview() {
             </ul>
           </div>
           <div class="doc-page-footer">
-            <span class="doc-page-footer-title">Software Radar</span>
+            <span class="doc-page-footer-title">Markdown2PDF</span>
             <span>Trang 2</span>
           </div>
         </div>
@@ -463,7 +463,7 @@ function renderPreview() {
             ${elementsHtml}
           </div>
           <div class="doc-page-footer">
-            <span class="doc-page-footer-title">Software Radar — Sales Kit</span>
+            <span class="doc-page-footer-title">Markdown2PDF Kit</span>
             <span>Trang ${pageNum}</span>
           </div>
         </div>
